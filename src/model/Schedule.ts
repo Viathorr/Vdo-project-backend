@@ -21,7 +21,6 @@ const classSchema = new Schema<Class>({
 });
 
 const daySchema = new Schema<DayDocument>({
-  _id: {type: false},
   id: { type: Number, required: true },
   dayName: { type: String, required: true },
   classes: [classSchema],

@@ -7,7 +7,6 @@ interface TodoDocument extends Document {
 }
 
 const todoSchema = new Schema<TodoDocument>({
-  _id: {type: false},
   id: { type: Number, required: true },
   name: { type: String, required: true },
   checked: {type: Boolean, default: false}
