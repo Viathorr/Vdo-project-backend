@@ -4,11 +4,11 @@ import todosController from "../../controllers/todos/todos.controller";
 const todosRouter: Router = Router();
 
 todosRouter.route('/')
-  .get()
-  .post()
-  .delete();
-
+  .get(todosController.getTodos)
+  .post(todosController.addTodo);
+ 
 todosRouter.route('/:id')
-  .put();
+  .put(todosController.updateTodo)
+  .delete(todosController.deleteTodo);
 
 export default todosRouter;
