@@ -36,9 +36,7 @@ app.use('/todos', todosRouter);
 
 app.all('*', (req: Request, res: Response) => {
   res.status(404);
-  if (req.accepts('html')) {
-    return res.sendFile(path.join(__dirname, 'views', '404.html'));
-  } else if (req.accepts('json')) {
+  if (req.accepts('json')) {
     return res.json({ error: '404 Not Found' });  // sends data in json format
   } else {
     return res.type('txt').send('404 Not Found');
