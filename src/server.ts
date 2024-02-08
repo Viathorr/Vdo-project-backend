@@ -10,6 +10,7 @@ import scheduleRouter from './routes/api/schedule.router';
 import todosRouter from './routes/api/todos.router';
 import { connectDb } from './config/mongodbConn';
 import { connection } from './config/mysqlConn';
+import bodyParser from 'body-parser';
 // import { RowDataPacket, ResultSetHeader } from 'mysql2';
 
 const PORT = process.env.PORT || 3500;
@@ -42,10 +43,9 @@ app.use(helmet());  // safety, add some headers, look for more info
 app.use(credentials);
 app.use(cors(corsOptions));
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
 app.use(cookieParser());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Simple request');
