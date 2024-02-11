@@ -9,34 +9,15 @@ import mongoose from 'mongoose';
 import scheduleRouter from './routes/api/schedule.router'; 
 import todosRouter from './routes/api/todos.router';
 import { connectDb } from './config/mongodbConn';
-import { connection } from './config/mysqlConn';
+import { AppDataSource } from './config/mysqlConn';
 import bodyParser from 'body-parser';
-// import { RowDataPacket, ResultSetHeader } from 'mysql2';
 
 const PORT = process.env.PORT || 3500;
 
 const app: Express = express();
 
-// interface User extends RowDataPacket {
-//   id: number,
-//   name: string,
-//   email: string,
-//   password: string
-// }
-
 // MongoDB connection
 connectDb();
-// MySQL connection
-connection.connect((err) => {
-  if (err) {
-    throw new Error('Connection to MySQL failed.');
-  } else {
-    console.log('Connected to MySQL.');
-  }
-});
-// connection.query<User[]>("SELECT * FROM user WHERE email = 'example@gmail.com';", (_err, rows) => {
-//   console.log('User`s name:', rows[0].name);
-// });
 
 app.use(helmet());  // safety, add some headers, look for more info
 
@@ -65,5 +46,10 @@ app.all('*', (req: Request, res: Response) => {
 
 mongoose.connection.once('open', () => {
   console.log('Connected to MongoDB.');
-  app.listen(PORT, () => console.log(`Server running on port ${PORT}.`));
+  AppDataSource.initialize()
+    .then(() => {
+      console.log('Connected to MySQL.')
+      app.listen(PORT, () => console.log(`Server running on port ${PORT}.`));
+    })
+    .catch((error) => console.error(error));
 });

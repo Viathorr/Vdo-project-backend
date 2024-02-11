@@ -1,8 +1,14 @@
-import mysql from 'mysql2';
+import { DataSource } from 'typeorm';
+import { User } from '../entity/user.entity';
+import { Todo } from '../entity/todo.entity';
 
-export const connection: mysql.Connection = mysql.createConnection({
+export const AppDataSource = new DataSource({
+  type: 'mysql',
   host: process.env.DB_HOST,
-  user: process.env.DB_USER,
+  port: Number(process.env.DB_PORT),
+  username: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME
+  database:  process.env.DB_NAME,
+  entities: [User, Todo],
+  synchronize: true
 });
