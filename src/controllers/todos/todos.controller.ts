@@ -1,9 +1,27 @@
 import { Todo } from "../../entity/todo.entity";
-import { Request, Response } from "express";
+import { Request, Response, Router } from "express";
 import { AppDataSource } from "../../config/mysqlConn";
+import Controller from "interfaces/controller.interface";
 
 
-class TodosController {
+class TodosController implements Controller {
+  path: string = '/todos';
+  router: Router = Router();
+  
+  constructor() {
+    this.initializeRoutes();
+  }
+
+  private initializeRoutes() {
+    this.router.route(this.path)
+      .get(this.getTodos)
+      .post(this.addTodo);
+    
+    this.router.route(`${this.path}/:id`)
+      .put(this.updateTodo)
+      .delete(this.deleteTodo);
+  }
+
   public async getTodos(req: Request, res: Response) {
     const todos: Todo[] = await Todo.find(); // we get an array of todos
     if (!todos?.length) {
