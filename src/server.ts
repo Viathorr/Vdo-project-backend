@@ -6,8 +6,8 @@ import { corsOptions } from './config/corsOptions';
 import express, { Express, Request, Response } from "express";
 import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
-import scheduleRouter from './routes/api/schedule.router'; 
-import todosRouter from './routes/api/todos.router';
+import todosController from 'controllers/todos/todos.controller';
+import scheduleController from 'controllers/schedule/schedule.controller';
 import { connectDb } from './config/mongodbConn';
 import { AppDataSource } from './config/mysqlConn';
 import bodyParser from 'body-parser';
@@ -16,7 +16,6 @@ const PORT = process.env.PORT || 3500;
 
 const app: Express = express();
 
-// MongoDB connection
 connectDb();
 
 app.use(helmet());  // safety, add some headers, look for more info
@@ -32,8 +31,8 @@ app.get('/', (req: Request, res: Response) => {
   res.send('Simple request');
 });
 
-app.use('/schedule', scheduleRouter);
-app.use('/todos', todosRouter);
+app.use('/', todosController.router);
+app.use('/', scheduleController.router);
 
 app.all('*', (req: Request, res: Response) => {
   res.status(404);

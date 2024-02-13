@@ -2,7 +2,9 @@ import { Todo } from "../../entity/todo.entity";
 import { Request, Response, Router } from "express";
 import { AppDataSource } from "../../config/mysqlConn";
 import Controller from "interfaces/controller.interface";
+import CreateTodoDto from "../../dto/todo.dto";
 
+// TODO create todosService to handle database interactions
 
 class TodosController implements Controller {
   path: string = '/todos';
@@ -22,7 +24,7 @@ class TodosController implements Controller {
       .delete(this.deleteTodo);
   }
 
-  public async getTodos(req: Request, res: Response) {
+  private async getTodos(req: Request, res: Response) {
     const todos: Todo[] = await Todo.find(); // we get an array of todos
     if (!todos?.length) {
       return res.status(204).json({ 'message': 'No todos were found.' });
@@ -30,7 +32,7 @@ class TodosController implements Controller {
     return res.json(todos);
   }
 
-  public async addTodo(req: Request, res: Response) {
+  private async addTodo(req: Request, res: Response) {
     if (!req.body?.id || !req.body?.name) {
       return res.status(400).json({ 'message': 'Todo ID and name are required.' });
     }
@@ -58,7 +60,7 @@ class TodosController implements Controller {
     }
   }
 
-  public async updateTodo(req: Request, res: Response) {
+  private async updateTodo(req: Request, res: Response) {
     // The only thing that can be changed is 'checked' property
     if (!req.params?.id) {
       return res.status(400).json({ 'message': 'Todo ID is required.' });
@@ -78,7 +80,7 @@ class TodosController implements Controller {
     return res.json(result);
   }
 
-  public async deleteTodo(req: Request, res: Response) {
+  private async deleteTodo(req: Request, res: Response) {
     if (!req.params?.id) {
       return res.status(400).json({ 'message': 'Todo ID is required.' });
     }
