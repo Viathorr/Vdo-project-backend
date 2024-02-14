@@ -12,6 +12,7 @@ import { connectDb } from './config/mongodbConn';
 import AppDataSource from './config/mysqlConn';
 import bodyParser from 'body-parser';
 import registerController from './controllers/authentication/register.controller';
+import authController from './controllers/authentication/auth.controller';
 
 const PORT = process.env.PORT || 3500;
 
@@ -33,6 +34,7 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 app.use('/', registerController.router);
+app.use('/', authController.router);
 app.use('/', todosController.router);
 app.use('/', scheduleController.router);
 

@@ -25,6 +25,12 @@ export class User extends BaseEntity {
   @UpdateDateColumn()
   update_at: Date;
 
+  @Column({
+    nullable: true,
+    default: ''
+  })
+  refresh_token: string;
+
   @OneToMany(
     () => Todo,
     todo => todo.creator
