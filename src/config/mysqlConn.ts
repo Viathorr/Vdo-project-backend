@@ -2,7 +2,7 @@ import { DataSource } from 'typeorm';
 import { User } from '../entity/user.entity';
 import { Todo } from '../entity/todo.entity';
 
-export const AppDataSource = new DataSource({
+const AppDataSource = new DataSource({
   type: 'mysql',
   host: process.env.DB_HOST,
   port: Number(process.env.DB_PORT),
@@ -12,3 +12,5 @@ export const AppDataSource = new DataSource({
   entities: [User, Todo],
   synchronize: true
 });
+
+export default AppDataSource;

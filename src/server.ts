@@ -6,11 +6,12 @@ import { corsOptions } from './config/corsOptions';
 import express, { Express, Request, Response } from "express";
 import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
-import todosController from 'controllers/todos/todos.controller';
-import scheduleController from 'controllers/schedule/schedule.controller';
+import todosController from './controllers/todos/todos.controller';
+import scheduleController from './controllers/schedule/schedule.controller';
 import { connectDb } from './config/mongodbConn';
-import { AppDataSource } from './config/mysqlConn';
+import AppDataSource from './config/mysqlConn';
 import bodyParser from 'body-parser';
+import registerController from './controllers/authentication/register.controller';
 
 const PORT = process.env.PORT || 3500;
 
@@ -31,6 +32,7 @@ app.get('/', (req: Request, res: Response) => {
   res.send('Simple request');
 });
 
+app.use('/', registerController.router);
 app.use('/', todosController.router);
 app.use('/', scheduleController.router);
 
