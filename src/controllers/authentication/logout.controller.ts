@@ -1,11 +1,11 @@
 import { Router, Request, Response } from "express";
-import CreateUserDto from "../../dto/user.dto";
 import Controller from "../../interfaces/controller.interface";
+import AuthenticationService from "../../service/authentication.service";
 
 class LogoutController implements Controller {
   public path: string = '/logout';
   public router: Router = Router();
-  // private logoutService
+  private authenticationService: AuthenticationService = new AuthenticationService();
 
   constructor() {
     this.initializeRoutes();
@@ -24,9 +24,15 @@ class LogoutController implements Controller {
     const refreshToken = cookies.jwt;
 
     try {
-      // TODO add logic
+      const result = this.authenticationService.userExistsByRefreshToken(refreshToken);
+      if (!result) {
+        res.clearCookie('jwt', { httpOnly: true });
+      } else {
+        res.clearCookie('jwt', { httpOnly: true, sameSite: 'none', secure: true, maxAge: 7 * 24 * 60 * 60 * 1000 });
+      }
       return res.sendStatus(204);
     } catch (err) {
+      console.log(err);
       return res.sendStatus(204);
     }
   }

@@ -1,12 +1,12 @@
 import { Router, Request, Response } from "express";
 import CreateUserDto from "../../dto/user.dto";
 import Controller from "../../interfaces/controller.interface";
-import RegistrationService from "../../service/registration.service";
+import AuthenticationService from "../../service/authentication.service";
 
 class RegisterController implements Controller {
   public path: string = '/register';
   public router: Router = Router();
-  private registrationService: RegistrationService = new RegistrationService();
+  private authenticationService: AuthenticationService = new AuthenticationService();
 
   constructor() {
     this.initializeRoutes();
@@ -26,7 +26,7 @@ class RegisterController implements Controller {
 
     const userData: CreateUserDto = req.body;
     try {
-      const result = await this.registrationService.register(userData);
+      const result = await this.authenticationService.register(userData);
       console.log(result);
       return res.status(201).json({ 'success': `New user ${name} was created!` });
     } catch (err) {

@@ -13,6 +13,7 @@ import AppDataSource from './config/mysqlConn';
 import bodyParser from 'body-parser';
 import registerController from './controllers/authentication/register.controller';
 import authController from './controllers/authentication/auth.controller';
+import logoutController from './controllers/authentication/logout.controller';
 
 const PORT = process.env.PORT || 3500;
 
@@ -35,6 +36,7 @@ app.get('/', (req: Request, res: Response) => {
 
 app.use('/', registerController.router);
 app.use('/', authController.router);
+app.use('/', logoutController.router);
 app.use('/', todosController.router);
 app.use('/', scheduleController.router);
 

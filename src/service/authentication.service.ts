@@ -9,6 +9,21 @@ import TokenData from "../interfaces/tokenData.interface";
 class AuthenticationService {
   private userRepository = AppDataSource.getRepository(User);
 
+  public async register(userData: CreateUserDto) {
+    const user = await this.userRepository.findOneBy({ email: userData.email });
+    if (user) {
+      throw new Error('User with such email already exists.');
+    } else {
+      const hashedPwd = await bcrypt.hash(userData.password, 10);
+      const newUser = this.userRepository.create({
+        ...userData,
+        password: hashedPwd
+      });
+      const result = this.userRepository.save(newUser);
+      return result;
+    }
+  }
+
   public async login(userData: CreateUserDto) {
     const user = await this.userRepository.findOneBy({ email: userData.email });
     if (user) {
@@ -24,6 +39,19 @@ class AuthenticationService {
       }
     } else {
       throw new Error('No user with such email exists.');
+    }
+  }
+
+  public async userExistsByRefreshToken(refreshToken: string) {
+    const user = await this.userRepository.findOneBy({ refresh_token: refreshToken });
+    if (!user) {
+      return false;
+    } else {
+      user.refresh_token = '';
+      const result = await this.userRepository.save(user);
+      console.log(result);
+    
+      return true;
     }
   }
 
