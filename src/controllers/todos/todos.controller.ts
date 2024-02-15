@@ -1,14 +1,16 @@
 import { Todo } from "../../entity/todo.entity";
 import { Request, Response, Router } from "express";
-import { AppDataSource } from "../../config/mysqlConn";
-import Controller from "interfaces/controller.interface";
-import CreateTodoDto from "../../dto/todo.dto";
+import AppDataSource from "../../config/mysqlConn";
+import Controller from "../../interfaces/controller.interface";
+import RequestWithUserId from "../../interfaces/requestWithUserId.interface";
+import TodosService from "../../service/todos.service";
 
 // TODO create todosService to handle database interactions
 
 class TodosController implements Controller {
-  path: string = '/todos';
-  router: Router = Router();
+  public path: string = '/todos';
+  public router: Router = Router();
+  private todosService = new TodosService();
   
   constructor() {
     this.initializeRoutes();
@@ -16,7 +18,9 @@ class TodosController implements Controller {
 
   private initializeRoutes() {
     this.router.route(this.path)
+      // @ts-ignore
       .get(this.getTodos)
+      // @ts-ignore
       .post(this.addTodo);
     
     this.router.route(`${this.path}/:id`)
@@ -24,27 +28,21 @@ class TodosController implements Controller {
       .delete(this.deleteTodo);
   }
 
-  private async getTodos(req: Request, res: Response) {
-    const todos: Todo[] = await Todo.find(); // we get an array of todos
+  private async getTodos(req: RequestWithUserId, res: Response) {
+    // const todos: Todo[] = await Todo.find(); // we get an array of todos
+    const todos: Todo[] = await AppDataSource.getRepository(Todo).createQueryBuilder('todos').where('user_id = :userId', { userId: req.id }).getMany();
+    console.log(todos);
     if (!todos?.length) {
       return res.status(204).json({ 'message': 'No todos were found.' });
     }
     return res.json(todos);
   }
 
-  private async addTodo(req: Request, res: Response) {
+  private async addTodo(req: RequestWithUserId, res: Response) {
     if (!req.body?.id || !req.body?.name) {
       return res.status(400).json({ 'message': 'Todo ID and name are required.' });
     }
     try {
-      // 1st method (which one to use is up to you)
-      // const todo = new Todo({
-      //   id: req.body.id,
-      //   name: req.body.name
-      // });
-      // await todo.save();
-
-      // 2nd method
       const todo = Todo.create({
         id: req.body.id,
         name: req.body.name

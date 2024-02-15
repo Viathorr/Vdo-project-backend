@@ -14,6 +14,7 @@ import bodyParser from 'body-parser';
 import registerController from './controllers/authentication/register.controller';
 import authController from './controllers/authentication/auth.controller';
 import logoutController from './controllers/authentication/logout.controller';
+import verifyJWT from './middleware/verifyJWT';
 
 const PORT = process.env.PORT || 3500;
 
@@ -37,6 +38,8 @@ app.get('/', (req: Request, res: Response) => {
 app.use('/', registerController.router);
 app.use('/', authController.router);
 app.use('/', logoutController.router);
+// @ts-ignore
+app.use(verifyJWT);
 app.use('/', todosController.router);
 app.use('/', scheduleController.router);
 
