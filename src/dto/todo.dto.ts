@@ -4,12 +4,18 @@ class CreateTodoDto {
   @IsString()
   public name: string;
 
-  @IsOptional()
-  @IsBoolean()
-  public checked: boolean | null;
-
   @IsNumber()
-  public user_id: number;
+  public userId: number;
 }
 
-export default CreateTodoDto;
+// class for update and delete todo data
+class UpdateTodoDto {
+  @IsNumber()
+  public id: number;
+
+  @IsOptional()
+  @IsBoolean()
+  public checked: boolean;
+}
+
+export { CreateTodoDto, UpdateTodoDto };

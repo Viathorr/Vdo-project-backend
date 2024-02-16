@@ -8,7 +8,6 @@ const verifyJWT = (req: RequestWithUserId, res: Response, next: NextFunction) =>
   const authHeader = req.headers.authorization;
 
   if (authHeader && authHeader.startsWith('Bearer ')) {
-    console.log('there are auth headers', authHeader)
     const secret = process.env.ACCESS_TOKEN_SECRET;
     const token = authHeader.split(' ')[1]; // first word is 'Bearer' and the next one after whitespace is token
 
