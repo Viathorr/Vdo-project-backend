@@ -16,6 +16,7 @@ class AuthController implements Controller {
       .post(this.authenticate);
   }
 
+  // TODO: send user name with response
   private authenticate = async (req: Request, res: Response) => {
     const { email, password } = req.body;
     if (!email || !password) {

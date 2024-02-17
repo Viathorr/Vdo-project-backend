@@ -19,8 +19,14 @@ class AuthenticationService {
         ...userData,
         password: hashedPwd
       });
+      const tokenData: TokenData = { id: newUser.id };
+      const accessToken = this.createAccessToken(tokenData);
+      const refreshToken = this.createRefreshToken(tokenData);
+      this.userRepository.merge(newUser, { refresh_token: refreshToken });
       const result = this.userRepository.save(newUser);
-      return result;
+      console.log(result);
+      
+      return { accessToken, refreshToken };
     }
   }
 
