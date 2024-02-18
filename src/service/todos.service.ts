@@ -8,7 +8,6 @@ class TodosService {
 
   public async getAllTodos(userId: number) {
     const todos = await this.todoRepository.createQueryBuilder('todos').where('user_id = :userId', { userId }).getMany();
-    console.log(todos);
     return todos;
   }
 

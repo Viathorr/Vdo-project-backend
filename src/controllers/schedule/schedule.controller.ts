@@ -16,6 +16,7 @@ class ScheduleController {
   }
 
   public async getSchedule(req: Request, res: Response) {
+    console.log('Get schedule request.');
     const daysSchedule = await Day.find(); // we get an array of days schedule
     if (!daysSchedule?.length) {
       return res.status(204).json({ 'message': 'No schedule was found.' });

@@ -5,6 +5,7 @@ import RequestWithUserId from '../interfaces/requestWithUserId.interface';
 
 // @ts-ignore
 const verifyJWT = (req: RequestWithUserId, res: Response, next: NextFunction) => {
+  console.log('in verify jwt');
   const authHeader = req.headers.authorization;
 
   if (authHeader && authHeader.startsWith('Bearer ')) {
@@ -25,6 +26,7 @@ const verifyJWT = (req: RequestWithUserId, res: Response, next: NextFunction) =>
       }
     );
   } else {
+    console.log('wrong jwt');
     return res.sendStatus(401);
   }
 };

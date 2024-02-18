@@ -27,6 +27,7 @@ class TodosController implements Controller {
   }
 
   private getTodos = async (req: RequestWithUserId, res: Response) => {
+    console.log('Get todos request\n');
     const todos: Todo[] = await this.todosService.getAllTodos(req.id);
     if (!todos?.length) {
       return res.status(204).json({ 'message': 'No todos were found.' });
@@ -35,6 +36,7 @@ class TodosController implements Controller {
   }
 
   private addTodo = async (req: RequestWithUserId, res: Response) => {
+    console.log('Add todo request.\n');
     if (!req.body?.name) {
       return res.status(400).json({ 'message': 'Todo name are required.' });
     }
@@ -48,6 +50,7 @@ class TodosController implements Controller {
   }
 
   private updateTodo = async (req: Request, res: Response) => {
+    console.log('Update todo request.\n');
     // The only thing that can be changed is 'checked' property
     if (!req.params?.id) {
       return res.status(400).json({ 'message': 'Todo ID is required.' });
@@ -64,6 +67,7 @@ class TodosController implements Controller {
   }
 
   private deleteTodo = async (req: Request, res: Response) => {
+    console.log('Delete todo request.\n');
     if (!req.params?.id) {
       return res.status(400).json({ 'message': 'Todo ID is required.' });
     }

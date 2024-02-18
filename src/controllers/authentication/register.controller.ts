@@ -30,7 +30,7 @@ class RegisterController implements Controller {
 
       res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'none', /*secure: true,*/ maxAge: 7 * 24 * 60 * 60 * 1000 });
       
-      return res.status(201).json({ message: `New user ${name} was created!`, accessToken });
+      return res.status(201).json({ accessToken });
     } catch (err) {
       return res.status(500).json({ message: err });
     }
