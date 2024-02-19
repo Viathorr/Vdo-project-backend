@@ -18,7 +18,7 @@ class TodosService {
           id: todoData.userId
         }
       }).execute();
-      return todo;
+      return todo.generatedMaps[0];
     } catch (err) {
       throw new Error('An unexpected error occurred while processing your request.');
     }

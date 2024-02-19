@@ -18,7 +18,9 @@ class RegisterController implements Controller {
   }
 
   private register = async (req: Request, res: Response) => {
+    console.log('registration request');
     const { name, email, password } = req.body;
+    console.log(name, email, password);
     // Checking if username, email and password are provided.
     if (!name || !email || !password) {
       return res.status(400).json({ 'message': 'Username and password are required.' });
@@ -32,6 +34,7 @@ class RegisterController implements Controller {
       
       return res.status(201).json({ accessToken });
     } catch (err) {
+      console.log(err);
       return res.status(500).json({ message: err });
     }
   }

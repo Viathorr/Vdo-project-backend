@@ -41,7 +41,7 @@ class TodosController implements Controller {
       return res.status(400).json({ 'message': 'Todo name are required.' });
     }
     try {
-      const todo = this.todosService.addTodo({ ...req.body, userId: req.id });
+      const todo = await this.todosService.addTodo({ ...req.body, userId: req.id });
       return res.status(201).json(todo);
     } catch (err) {
       console.error(err);
