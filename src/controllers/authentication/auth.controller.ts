@@ -27,9 +27,9 @@ class AuthController implements Controller {
     try {
       const { accessToken, refreshToken } = await this.authenticationService.login(req.body);
 
-      res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'none', /*secure: true,*/ maxAge: 7 * 24 * 60 * 60 * 1000 });
+      // res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'none', /*secure: true,*/ maxAge: 7 * 24 * 60 * 60 * 1000 });
 
-      return res.json({ accessToken });
+      return res.json({ accessToken, refreshToken });
     } catch (err) {
       if (err instanceof Error) 
       {

@@ -30,9 +30,9 @@ class RegisterController implements Controller {
     try {
       const { accessToken, refreshToken } = await this.authenticationService.register(userData);
 
-      res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'none', /*secure: true,*/ maxAge: 7 * 24 * 60 * 60 * 1000 });
+      // res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'none', /*secure: true,*/ maxAge: 7 * 24 * 60 * 60 * 1000 });
       
-      return res.status(201).json({ accessToken });
+      return res.status(201).json({ accessToken, refreshToken });
     } catch (err) {
       console.log(err);
       return res.status(500).json({ message: err });

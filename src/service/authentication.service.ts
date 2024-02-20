@@ -66,22 +66,26 @@ class AuthenticationService {
     }
   }
 
-  // @ts-ignore
   public async refreshToken(refreshToken: string): Promise<jwtTokens> {
     const foundUser = await this.userRepository.findOneBy({ refresh_token: refreshToken });
     if (!foundUser) {
       throw new Error('User was not found.');
     } else {
       const secret = process.env.REFRESH_TOKEN_SECRET;
-      // @ts-ignore
-      jwt.verify(refreshToken, secret, (err, decoded: TokenData) => {
-        if (err || decoded.id !== foundUser.id) {
-          throw new Error('Error occured.');
-        } else {
-          const accessToken: string = this.createAccessToken(decoded);
-          const refreshToken: string = this.createRefreshToken(decoded);
-          return { accessToken, refreshToken };
-        }
+      
+      return new Promise((resolve, reject) => {
+        // @ts-ignore
+        jwt.verify(refreshToken, secret, (err, decoded: TokenData) => {
+          if (err || decoded.id !== foundUser.id) {
+            reject(new Error('Error occurred.'));
+          } else {
+            console.log("In refresh token service function, decoded data: ", decoded);
+            const accessToken = this.createAccessToken({ id: decoded.id });
+            const refreshToken = this.createRefreshToken({ id: decoded.id });
+            console.log("access: ", accessToken, "refresh: ", refreshToken);
+            resolve({ accessToken, refreshToken });
+          }
+        });
       });
     }
   }
@@ -92,7 +96,7 @@ class AuthenticationService {
       tokenData,
       // @ts-ignore
       secret,
-      { expiresIn: '1m' }
+      { expiresIn: '30s' }
     );
 
     return accessToken;

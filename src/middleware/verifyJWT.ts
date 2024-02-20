@@ -19,6 +19,7 @@ const verifyJWT = (req: RequestWithUserId, res: Response, next: NextFunction) =>
       // @ts-ignore
       (err, decoded: TokenData) => {
         if (err) {
+          console.log("jwt expired")
           return res.sendStatus(403); // invalid token
         }
         req.id = decoded.id;
@@ -26,7 +27,7 @@ const verifyJWT = (req: RequestWithUserId, res: Response, next: NextFunction) =>
       }
     );
   } else {
-    console.log('wrong jwt');
+    console.log('no jwt');
     return res.sendStatus(401);
   }
 };

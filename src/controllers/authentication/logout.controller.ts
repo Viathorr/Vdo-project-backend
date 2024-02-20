@@ -16,6 +16,7 @@ class LogoutController implements Controller {
       .post(this.logout);
   }
 
+  // TODO update
   private logout = async (req: Request, res: Response) => {
     const cookies = req.cookies;
     if (!cookies?.jwt) {

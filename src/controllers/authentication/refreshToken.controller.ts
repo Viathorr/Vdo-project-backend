@@ -13,30 +13,29 @@ class AuthController implements Controller {
  
   private initializeRoutes() {
     this.router.route(this.path)
-      .get(this.refreshToken);
+      .post(this.refreshToken);
   }
 
   private refreshToken = async (req: Request, res: Response) => {
     console.log('Refresh token request');
-    const cookies = req.cookies;
-    console.log(cookies);
+    console.log(req.body.refreshToken);
 
-    if (!cookies?.jwt) {
+    if (!req.body?.refreshToken) {
       return res.sendStatus(401);
     }
 
-    const prevRefreshToken = cookies.jwt;
+    const prevRefreshToken = req.body.refreshToken;
     
     try {
       const { accessToken, refreshToken } = await this.authenticationService.refreshToken(prevRefreshToken);
 
-      res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'none', /*secure: true,*/ maxAge: 7 * 24 * 60 * 60 * 1000 });
+      // res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'none', /*secure: true,*/ maxAge: 7 * 24 * 60 * 60 * 1000 });
 
-      return res.json({ accessToken });
+      return res.json({ accessToken, refreshToken });
     } catch (err) {
       if (err instanceof Error) 
       {
-        console.log(err.message);
+        console.log(err.stack);
       }
       return res.sendStatus(403);
     }
