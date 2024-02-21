@@ -17,8 +17,7 @@ class AuthController implements Controller {
   }
 
   private refreshToken = async (req: Request, res: Response) => {
-    console.log('Refresh token request');
-    console.log(req.body.refreshToken);
+    console.log('Refresh token request', Date().toString());
 
     if (!req.body?.refreshToken) {
       return res.sendStatus(401);
