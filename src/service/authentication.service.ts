@@ -75,13 +75,15 @@ class AuthenticationService {
       
       return new Promise((resolve, reject) => {
         // @ts-ignore
-        jwt.verify(refreshToken, secret, (err, decoded: TokenData) => {
+        jwt.verify(refreshToken, secret, async (err, decoded: TokenData) => {
           if (err || decoded.id !== foundUser.id) {
             reject(new Error('Error occurred.'));
           } else {
             console.log("In refresh token service function, decoded data: ", decoded);
             const accessToken = this.createAccessToken({ id: decoded.id });
             const refreshToken = this.createRefreshToken({ id: decoded.id });
+            this.userRepository.merge(foundUser, { refresh_token: refreshToken });
+            await this.userRepository.save(foundUser);
             console.log("access: ", accessToken, "refresh: ", refreshToken);
             resolve({ accessToken, refreshToken });
           }
@@ -96,7 +98,7 @@ class AuthenticationService {
       tokenData,
       // @ts-ignore
       secret,
-      { expiresIn: '30s' }
+      { expiresIn: '10s' }
     );
 
     return accessToken;
