@@ -15,22 +15,17 @@ class LogoutController implements Controller {
     this.router.route(this.path)
       .post(this.logout);
   }
-
+ 
   // TODO update
   private logout = async (req: Request, res: Response) => {
-    const cookies = req.cookies;
-    if (!cookies?.jwt) {
+    const refreshToken = req.body?.refreshToken;
+    if (!refreshToken) {
+      console.log('no refresh token in request');
       return res.sendStatus(204); // No content
     }
-    const refreshToken = cookies.jwt;
 
     try {
       const result = this.authenticationService.userExistsByRefreshToken(refreshToken);
-      if (!result) {
-        res.clearCookie('jwt', { httpOnly: true });
-      } else {
-        res.clearCookie('jwt', { httpOnly: true, sameSite: 'none', secure: true, maxAge: 7 * 24 * 60 * 60 * 1000 });
-      }
       return res.sendStatus(204);
     } catch (err) {
       console.log(err);
