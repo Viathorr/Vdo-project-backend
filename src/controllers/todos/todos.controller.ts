@@ -3,12 +3,14 @@ import { Request, Response, Router } from "express";
 import Controller from "../../interfaces/controller.interface";
 import RequestWithUserId from "../../interfaces/requestWithUserId.interface";
 import TodosService from "../../service/todos.service";
+import { TodoDto, TodoDtoBuilder } from "../../dto/todo.dto";
 
 
 class TodosController implements Controller {
   public path: string = '/todos';
   public router: Router = Router();
-  private todosService = new TodosService();
+  private todosService: TodosService = new TodosService();
+  private todosBuilder: TodoDtoBuilder = new TodoDtoBuilder();
   
   constructor() {
     this.initializeRoutes();
@@ -38,10 +40,13 @@ class TodosController implements Controller {
   private addTodo = async (req: RequestWithUserId, res: Response) => {
     console.log('Add todo request.\n');
     if (!req.body?.name) {
-      return res.status(400).json({ 'message': 'Todo name are required.' });
+      return res.status(400).json({ 'message': 'Todo name is required.' });
     }
     try {
-      const todo = await this.todosService.addTodo({ ...req.body, userId: req.id });
+      this.todosBuilder.addUserId(req.id);
+      this.todosBuilder.addName(req.body.name);
+      const newTodo: TodoDto = this.todosBuilder.build();
+      const todo = await this.todosService.addTodo(newTodo);
       return res.status(201).json(todo);
     } catch (err) {
       console.error(err);
@@ -51,13 +56,18 @@ class TodosController implements Controller {
 
   private updateTodo = async (req: Request, res: Response) => {
     console.log('Update todo request.\n');
-    // The only thing that can be changed is 'checked' property
     if (!req.params?.id) {
       return res.status(400).json({ 'message': 'Todo ID is required.' });
     }
-
+    // The only thing that can be changed is 'checked' property
+    if (!('checked' in req.body)) {
+      return res.sendStatus(204);
+    }
     try {
-      const result = await this.todosService.updateTodo({ id: Number(req.params.id), ...req.body });
+      this.todosBuilder.addId(Number(req.params.id));
+      this.todosBuilder.addChecked(req.body.checked);
+      const updatedTodo: TodoDto = this.todosBuilder.build();
+      const result = await this.todosService.updateTodo(updatedTodo);
 
       return res.json(result);
     } catch (err) {
@@ -72,8 +82,9 @@ class TodosController implements Controller {
       return res.status(400).json({ 'message': 'Todo ID is required.' });
     }
     try {
-      // @ts-ignore
-      const result = await this.todosService.deleteTodo({ id: Number(req.params.id) });
+      this.todosBuilder.addId(Number(req.params.id));
+      const todoToDelete = this.todosBuilder.build();
+      const result = await this.todosService.deleteTodo(todoToDelete);
       return res.json(result);
     } catch (err) {
       return res.status(404).json({ 'message': err instanceof Error ? err.message : 'An unexpected error has occurred.' });

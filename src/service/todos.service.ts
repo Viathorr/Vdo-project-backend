@@ -1,4 +1,4 @@
-import { CreateTodoDto, UpdateTodoDto } from "../dto/todo.dto";
+import { TodoDto } from "../dto/todo.dto";
 import AppDataSource from "../config/mysqlConn";
 import { Todo } from "../entity/todo.entity";
 
@@ -11,7 +11,7 @@ class TodosService {
     return todos;
   }
 
-  public async addTodo(todoData: CreateTodoDto) {
+  public async addTodo(todoData: TodoDto) {
     try {
       const todo = await this.todoRepository.createQueryBuilder('todo').insert().into(Todo).values({
         name: todoData.name, creator: {
@@ -24,25 +24,23 @@ class TodosService {
     }
   }
 
-  public async updateTodo(todoData: UpdateTodoDto) {
+  public async updateTodo(todoData: TodoDto) {
     const todo = await this.todoRepository.findOneBy({ id: todoData.id });
     if (!todo) {
       throw new Error(`No todo matches ID ${todoData.id}.`);
     }
-    if ('checked' in todoData) {
-      AppDataSource.getRepository(Todo).merge(todo, todoData);
-    }
-
+    
+    AppDataSource.getRepository(Todo).merge(todo, todoData);
     const result = await AppDataSource.getRepository(Todo).save(todo);
     return result;
   }
-
-  public async deleteTodo(todoData: UpdateTodoDto) {
+ 
+  public async deleteTodo(todoData: TodoDto) {
     const todo = await AppDataSource.getRepository(Todo).findOneBy({ id: todoData.id });
     if (!todo) {
       throw new Error(`No todo matches ID ${todoData.id}.`);
     }
-
+    // @ts-ignore
     const result = await AppDataSource.getRepository(Todo).delete(todoData.id);
     if (result.affected == 1) {
       return { 'status': 'Success' };
