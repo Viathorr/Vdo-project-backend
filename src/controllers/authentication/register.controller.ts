@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import CreateUserDto from "../../dto/user.dto";
+import UserDto from "../../dto/user.dto";
 import Controller from "../../interfaces/controller.interface";
 import AuthenticationService from "../../service/authentication.service";
 
@@ -25,8 +25,8 @@ class RegisterController implements Controller {
     if (!name || !email || !password) {
       return res.status(400).json({ 'message': 'Username and password are required.' });
     }
- 
-    const userData: CreateUserDto = req.body;
+  
+    const userData: UserDto = req.body;
     try {
       const { accessToken, refreshToken } = await this.authenticationService.register(userData);
 

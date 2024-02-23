@@ -16,6 +16,7 @@ import authController from './controllers/authentication/auth.controller';
 import logoutController from './controllers/authentication/logout.controller';
 import verifyJWT from './middleware/verifyJWT';
 import refreshTokenController from './controllers/authentication/refreshToken.controller';
+import userController from './controllers/user/user.controller';
 
 const PORT = process.env.PORT || 3500;
 
@@ -40,6 +41,7 @@ app.use('/', refreshTokenController.router);
 app.use(verifyJWT);
 app.use('/', todosController.router);
 app.use('/', scheduleController.router);
+app.use('/', userController.router);
 
 app.all('*', (req: Request, res: Response) => {
   res.status(404);

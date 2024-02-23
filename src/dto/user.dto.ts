@@ -1,15 +1,25 @@
-import { IsEmail, IsString } from 'class-validator';
+import { IsNumber, IsEmail, IsString, IsOptional } from 'class-validator';
 
-class CreateUserDto {
+class UserDto {
+  @IsNumber()
+  public id: number;
+
+  @IsOptional()
   @IsString()
-  public name: string;
-
+  public name?: string;
+ 
+  @IsOptional()
   @IsString()
   @IsEmail()
-  public email: string;
+  public email?: string;
 
+  @IsOptional()
   @IsString()
-  public password: string;
+  public password?: string;
+  
+  @IsOptional()
+  @IsString()
+  public newPassword?: string;
 }
 
-export default CreateUserDto;
+export default UserDto;

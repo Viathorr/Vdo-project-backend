@@ -1,4 +1,4 @@
-import CreateUserDto from "../dto/user.dto";
+import UserDto from "../dto/user.dto";
 import AppDataSource from "../config/mysqlConn";
 import { User } from "../entity/user.entity";
 import bcrypt from 'bcrypt';
@@ -14,14 +14,16 @@ type jwtTokens = {
 class AuthenticationService {
   private userRepository = AppDataSource.getRepository(User);
 
-  public async register(userData: CreateUserDto): Promise<jwtTokens> {
+  public async register(userData: UserDto): Promise<jwtTokens> {
     const user = await this.userRepository.findOneBy({ email: userData.email });
     if (user) {
       throw new Error('User with such email already exists.');
     } else {
+      // @ts-ignore
       const hashedPwd = await bcrypt.hash(userData.password, 10);
       const newUser = this.userRepository.create({
         ...userData,
+        // @ts-ignore
         password: hashedPwd
       }); 
       const tokenData: TokenData = { id: newUser.id };
@@ -35,9 +37,10 @@ class AuthenticationService {
     }
   }
 
-  public async login(userData: CreateUserDto): Promise<jwtTokens> {
+  public async login(userData: UserDto): Promise<jwtTokens> {
     const user = await this.userRepository.findOneBy({ email: userData.email });
     if (user) {
+      // @ts-ignore
       const match = await bcrypt.compare(userData.password, user.password);
       if (match) {
         const tokenData: TokenData = { id: user.id };

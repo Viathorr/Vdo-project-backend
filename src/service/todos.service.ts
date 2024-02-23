@@ -30,18 +30,18 @@ class TodosService {
       throw new Error(`No todo matches ID ${todoData.id}.`);
     }
     
-    AppDataSource.getRepository(Todo).merge(todo, todoData);
-    const result = await AppDataSource.getRepository(Todo).save(todo);
+    this.todoRepository.merge(todo, todoData);
+    const result = await this.todoRepository.save(todo);
     return result;
   }
  
   public async deleteTodo(todoData: TodoDto) {
-    const todo = await AppDataSource.getRepository(Todo).findOneBy({ id: todoData.id });
+    const todo = await this.todoRepository.findOneBy({ id: todoData.id });
     if (!todo) {
       throw new Error(`No todo matches ID ${todoData.id}.`);
     }
     // @ts-ignore
-    const result = await AppDataSource.getRepository(Todo).delete(todoData.id);
+    const result = await this.todoRepository.delete(todoData.id);
     if (result.affected == 1) {
       return { 'status': 'Success' };
     } else {
