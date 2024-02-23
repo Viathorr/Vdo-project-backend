@@ -14,13 +14,16 @@ class UserController implements Controller {
   }
 
   private initializeRoutes() {
+    this.router.route(this.path)
+      // @ts-ignore
+      .get(this.getUserInfo);
     this.router.route(`${this.path}/change-name`)
       // @ts-ignore
-      .post(this.changeName);
+      .put(this.changeName);
     
     this.router.route(`${this.path}/change-password`)
       // @ts-ignore
-      .post(this.changePassword);
+      .put(this.changePassword);
     
     // this.router.route(`${this.path}/add-profile-image`)
     //   // @ts-ignore
@@ -31,7 +34,20 @@ class UserController implements Controller {
 
   // }
 
+  private getUserInfo = async (req: RequestWithUserId, res: Response) => {
+    console.log('Get user info request');
+    try {
+      const user = await this.userService.getUserData(req.id);
+      console.log(user);
+      return res.status(200).json(user);
+    } catch (err) {
+      console.log(err);
+      return res.sendStatus(err instanceof Error ? err.message === 'No user with such ID.' ? 401 : 500 : 404);
+    }
+  }
+
   private changeName = async (req: RequestWithUserId, res: Response) => {
+    console.log('Change username request');
     if (!req.body?.name) {
       return res.sendStatus(204);
     }
@@ -47,6 +63,7 @@ class UserController implements Controller {
   }
   
   private changePassword = async (req: RequestWithUserId, res: Response) => {
+    console.log('Change password request');
     if (!req.body?.currPassword || !req.body?.newPassword) {
       return res.sendStatus(204);
     }

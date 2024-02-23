@@ -7,8 +7,13 @@ class TodosService {
   private todoRepository = AppDataSource.getRepository(Todo);
 
   public async getAllTodos(userId: number) {
-    const todos = await this.todoRepository.createQueryBuilder('todos').where('user_id = :userId', { userId }).getMany();
-    return todos;
+    try {
+      const todos = await this.todoRepository.createQueryBuilder('todos').where('user_id = :userId', { userId }).getMany();
+      return todos;
+    } catch (err) {
+      console.log(err);
+      throw new Error('An unexpected error occurred while processing your request.');
+    }
   }
 
   public async addTodo(todoData: TodoDto) {
@@ -25,27 +30,37 @@ class TodosService {
   }
 
   public async updateTodo(todoData: TodoDto) {
-    const todo = await this.todoRepository.findOneBy({ id: todoData.id });
-    if (!todo) {
-      throw new Error(`No todo matches ID ${todoData.id}.`);
+    try {
+      const todo = await this.todoRepository.findOneBy({ id: todoData.id });
+      if (!todo) {
+        throw new Error(`No todo matches ID ${todoData.id}.`);
+      }
+      
+      this.todoRepository.merge(todo, todoData);
+      const result = await this.todoRepository.save(todo);
+      return result;
+    } catch (err) {
+      console.log(err);
+      throw new Error('An unexpected error occurred while processing your request.');
     }
-    
-    this.todoRepository.merge(todo, todoData);
-    const result = await this.todoRepository.save(todo);
-    return result;
   }
  
   public async deleteTodo(todoData: TodoDto) {
-    const todo = await this.todoRepository.findOneBy({ id: todoData.id });
-    if (!todo) {
-      throw new Error(`No todo matches ID ${todoData.id}.`);
-    }
-    // @ts-ignore
-    const result = await this.todoRepository.delete(todoData.id);
-    if (result.affected == 1) {
-      return { 'status': 'Success' };
-    } else {
-      return { 'status': 'Fail' };
+    try {
+      const todo = await this.todoRepository.findOneBy({ id: todoData.id });
+      if (!todo) {
+        throw new Error(`No todo matches ID ${todoData.id}.`);
+      }
+      // @ts-ignore
+      const result = await this.todoRepository.delete(todoData.id);
+      if (result.affected == 1) {
+        return { 'status': 'Success' };
+      } else {
+        return { 'status': 'Fail' };
+      }
+    } catch (err) {
+      console.log(err);
+      throw new Error('An unexpected error occurred while processing your request.');
     }
   }
 };
