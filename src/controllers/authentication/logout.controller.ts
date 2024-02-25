@@ -23,9 +23,8 @@ class LogoutController implements Controller {
       console.log('no refresh token in request');
       return res.sendStatus(204); // No content
     }
-    console.log("refresh token:", refreshToken);
     try {
-      const result = this.authenticationService.userExistsByRefreshToken(refreshToken);
+      this.authenticationService.logout(refreshToken);
       res.clearCookie('refreshToken', { httpOnly: true, sameSite: 'none', secure: true, maxAge: 24 * 60 * 60 * 1000 });
       return res.sendStatus(204);
     } catch (err) {

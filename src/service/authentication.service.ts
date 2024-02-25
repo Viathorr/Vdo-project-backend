@@ -55,16 +55,19 @@ class AuthenticationService {
     }
   }
 
-  public async userExistsByRefreshToken(refreshToken: string): Promise<boolean> {
-    const user = await this.userRepository.findOneBy({ refresh_token: refreshToken });
-    if (!user) {
-      return false;
-    } else {
-      user.refresh_token = '';
-      const result = await this.userRepository.save(user);
-      console.log(result);
-    
-      return true;
+  public async logout(refreshToken: string): Promise<boolean> {
+    try {
+      const user = await this.userRepository.findOneBy({ refresh_token: refreshToken });
+      if (!user) {
+        return false;
+      } else {
+        user.refresh_token = '';
+        await this.userRepository.save(user);
+        return true;
+      }
+    } catch (err) {
+      console.log(err);
+      throw new Error('Unexpected database error occurred');
     }
   }
 
