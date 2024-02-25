@@ -82,7 +82,7 @@ class AuthenticationService {
         // @ts-ignore
         jwt.verify(prevRefreshToken, secret, async (err, decoded: TokenData) => {
           if (err || decoded.id !== foundUser.id) {
-            console.log(err);
+            console.log(err?.message);
             reject(new Error('Error occurred.'));
           } else {
             // console.log("In refresh token service function, decoded data: ", decoded);

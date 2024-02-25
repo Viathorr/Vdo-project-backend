@@ -32,9 +32,8 @@ class AuthController implements Controller {
 
       return res.json({ accessToken });
     } catch (err) {
-      if (err instanceof Error) 
-      {
-        console.log(err.stack);
+      if (err instanceof Error) {
+        console.log(err.message);
       }
       return res.sendStatus(403);
     }
