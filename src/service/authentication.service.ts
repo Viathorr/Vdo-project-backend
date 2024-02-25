@@ -20,12 +20,11 @@ class AuthenticationService {
       throw new Error('User with such email already exists.');
     } else {
       // @ts-ignore
-      const hashedPwd = await bcrypt.hash(userData.password, 10);
+      const hashedPwd = await bcrypt.hash(userData.password as string, 10);
       const newUser = this.userRepository.create({
         ...userData,
-        // @ts-ignore
         password: hashedPwd
-      }); 
+      });  
       const tokenData: TokenData = { id: newUser.id };
       const accessToken = this.createAccessToken(tokenData);
       const refreshToken = this.createRefreshToken(tokenData);
@@ -40,11 +39,11 @@ class AuthenticationService {
   public async login(userData: UserDto): Promise<jwtTokens> {
     const user = await this.userRepository.findOneBy({ email: userData.email });
     if (user) {
-      // @ts-ignore
-      const match = await bcrypt.compare(userData.password, user.password);
+      const match = await bcrypt.compare(userData.password as string, user.password);
       if (match) {
         const tokenData: TokenData = { id: user.id };
         const refreshToken = this.createRefreshToken(tokenData);
+        console.log("New refresh token:", refreshToken);
         this.userRepository.merge(user, { refresh_token: refreshToken });
         await this.userRepository.save(user);
         return { accessToken: this.createAccessToken(tokenData), refreshToken };
@@ -74,15 +73,16 @@ class AuthenticationService {
     if (!foundUser) {
       throw new Error('User was not found.');
     } else {
-      const secret = process.env.REFRESH_TOKEN_SECRET;
+      const secret = process.env.REFRESH_TOKEN_SECRET as string;
       
       return new Promise((resolve, reject) => {
         // @ts-ignore
         jwt.verify(prevRefreshToken, secret, async (err, decoded: TokenData) => {
           if (err || decoded.id !== foundUser.id) {
+            console.log(err);
             reject(new Error('Error occurred.'));
           } else {
-            console.log("In refresh token service function, decoded data: ", decoded);
+            // console.log("In refresh token service function, decoded data: ", decoded);
             const accessToken = this.createAccessToken({ id: decoded.id });
             const refreshToken = this.createRefreshToken({ id: decoded.id });
             this.userRepository.merge(foundUser, { refresh_token: refreshToken });
@@ -95,10 +95,9 @@ class AuthenticationService {
   }
 
   private createAccessToken(tokenData: TokenData): string {
-    const secret = process.env.ACCESS_TOKEN_SECRET;
+    const secret = process.env.ACCESS_TOKEN_SECRET as string;
     const accessToken = jwt.sign(
       tokenData,
-      // @ts-ignore
       secret,
       { expiresIn: '15m' }
     );
@@ -107,10 +106,9 @@ class AuthenticationService {
   }
 
   private createRefreshToken(tokenData: TokenData): string {
-    const secret = process.env.REFRESH_TOKEN_SECRET;
+    const secret = process.env.REFRESH_TOKEN_SECRET as string;
     const refreshToken = jwt.sign(
       tokenData,
-      // @ts-ignore
       secret,
       { expiresIn: '7d' }
     );

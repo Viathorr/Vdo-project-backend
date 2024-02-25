@@ -30,6 +30,7 @@ class TodosController implements Controller {
 
   private getTodos = async (req: RequestWithUserId, res: Response) => {
     console.log('Get todos request\n');
+    console.log('Cookies:', req.cookies?.refreshToken);
     const todos: Todo[] = await this.todosService.getAllTodos(req.id);
     if (!todos?.length) {
       return res.status(204).json({ 'message': 'No todos were found.' });

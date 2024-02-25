@@ -18,6 +18,7 @@ class AuthController implements Controller {
 
   private authenticate = async (req: Request, res: Response) => {
     console.log('Authenticate request');
+    console.log('cookies:', req.cookies?.refreshToken);
     const { email, password } = req.body;
     console.log(req.body);
     if (!email || !password) {
@@ -27,9 +28,9 @@ class AuthController implements Controller {
     try {
       const { accessToken, refreshToken } = await this.authenticationService.login(req.body);
 
-      // res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'none', /*secure: true,*/ maxAge: 7 * 24 * 60 * 60 * 1000 });
+      res.cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'none', secure: true, maxAge: 7 * 24 * 60 * 60 * 1000 });
 
-      return res.json({ accessToken, refreshToken });
+      return res.json({ accessToken });
     } catch (err) {
       if (err instanceof Error) 
       {
