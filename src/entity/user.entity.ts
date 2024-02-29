@@ -18,6 +18,24 @@ export class User extends BaseEntity {
 
   @Column()
   password: string;
+  
+  @Column({
+    nullable: true,
+    default: ''
+  })
+  profile_picture: string;
+  
+  @Column({
+    nullable: true,
+    default: ''
+  })
+  country: string;
+
+  @Column({
+    nullable: true,
+    default: ''
+  })
+  phone_num: string;
 
   @CreateDateColumn()
   created_at: Date;
