@@ -17,28 +17,28 @@ class UserController implements Controller {
     this.router.route(this.path)
       // @ts-ignore
       .get(this.getUserInfo);
-    this.router.route(`${this.path}/change-name`)
+    this.router.route(`${this.path}/change-user-info`)
       // @ts-ignore
-      .put(this.changeName);
+      .put(this.changeUserInfo);
     
     this.router.route(`${this.path}/change-password`)
       // @ts-ignore
       .put(this.changePassword);
+    
+    this.router.route(`${this.path}/delete-account`)
+      // @ts-ignore
+      .delete(this.deleteAccount);
     
     // this.router.route(`${this.path}/add-profile-image`)
     //   // @ts-ignore
     //   .post(this.addProfileImage);
   }
 
-  // private addProfileImage = async () => {
-
-  // }
-
   private getUserInfo = async (req: RequestWithUserId, res: Response) => {
     console.log('Get user info request');
     try {
       const user = await this.userService.getUserData(req.id);
-      console.log(user);
+      // console.log(user);
       return res.status(200).json(user);
     } catch (err) {
       console.log(err);
@@ -46,19 +46,20 @@ class UserController implements Controller {
     }
   }
 
-  private changeName = async (req: RequestWithUserId, res: Response) => {
-    console.log('Change username request');
-    if (!req.body?.name) {
+  private changeUserInfo = async (req: RequestWithUserId, res: Response) => {
+    console.log('Change user info request');
+    if (!req.body?.name && !req.body?.country && !req.body?.phoneNum && !req.body?.profileImage) {
+      console.log('No user info to update');
       return res.sendStatus(204);
     }
-    const userData: UserDto = { id: req.id, name: req.body.name };
+    const userData: UserDto = { id: req.id, ...req.body };
     try {
-      const result = await this.userService.changeUsername(userData);
+      const result = await this.userService.changeUserData(userData);
       console.log("Changing username result: ", result);
       return res.status(200).json({ message: "Success"});
     } catch (err) {
       console.log(err);
-      return res.status(400).json({ message: 'Failed to change username.' });
+      return res.status(400).json({ message: 'Failed to change user info.' });
     }
   }
   
@@ -76,7 +77,18 @@ class UserController implements Controller {
       console.log(err);
       return res.status(400).json({ message: err instanceof Error ? err.message : 'Failed to change password.' });
     }
-  }
+  };
+
+  private deleteAccount = async (req: RequestWithUserId, res: Response) => {
+    console.log('Delete account request');
+    try {
+      const result = await this.userService.deleteUser(req.id);
+      return res.status(200).json({ message: result });
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json({ message: 'Fail' });
+    }
+  };
 }
 
 export default new UserController();

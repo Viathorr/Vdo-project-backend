@@ -15,6 +15,18 @@ class UserDto {
 
   @IsOptional()
   @IsString()
+  public country?: string;
+
+  @IsOptional()
+  @IsString()
+  public phoneNum?: string;
+
+  @IsOptional()
+  @IsString()
+  public profilePicture?: string;
+
+  @IsOptional()
+  @IsString()
   public password?: string;
   
   @IsOptional()

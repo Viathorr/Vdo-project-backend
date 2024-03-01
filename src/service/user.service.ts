@@ -13,7 +13,7 @@ class UserService {
       if (!user) {
         throw new Error('No user with such ID.');
       } else {
-        return { name: user.name, email: user.email, createdAt: user.created_at };
+        return { name: user.name, email: user.email, country: user.country, phoneNum: user.phone_num, createdAt: user.created_at };
       }
     } catch (err) {
       console.log(err);
@@ -21,14 +21,15 @@ class UserService {
     }
   }
 
-  public async changeUsername(userData: UserDto) {
+  public async changeUserData(userData: UserDto) {
     try {
       const user = await this.userRepository.findOneBy({ id: userData.id });
       if (!user) {
         throw new Error("No user with such ID.");
       } else {
         // @ts-ignore 
-        this.userRepository.merge(user, { name: userData.name });
+        this.userRepository.merge(user, { name: userData.name, country: userData.country, phone_num: userData.phoneNum, profile_picture: userData.profilePicture });
+        console.log(user);
         const result = await this.userRepository.save(user);
         return result;
       }
@@ -58,8 +59,21 @@ class UserService {
         throw new Error('No user with such ID.');
       }
     } catch (err) {
-      console.log(err);
-      throw new Error('An unexpected error occurred while processing your request.');
+      throw new Error(err instanceof Error ? err.message : 'An unexpected error occurred while processing your request.');
+    }
+  }
+
+  public async deleteUser(id: number) {
+    try {
+      const user = await this.userRepository.findOneBy({ id });
+      if (user) {
+        const res = await this.userRepository.delete({ id });
+        return res.affected ? 'Success' : 'Fail';
+      } else {
+        throw new Error('No user with such ID exosts.');
+      }
+    } catch (err) {
+      throw new Error(err instanceof Error ? err.message : 'Unexpected error occurred');
     }
   }
 }
