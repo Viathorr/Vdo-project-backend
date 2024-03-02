@@ -83,6 +83,8 @@ class UserController implements Controller {
     console.log('Delete account request');
     try {
       const result = await this.userService.deleteUser(req.id);
+      
+      res.clearCookie('refreshToken', { httpOnly: true, sameSite: 'none', secure: true, maxAge: 24 * 60 * 60 * 1000 });
       return res.status(200).json({ message: result });
     } catch (err) {
       console.log(err);

@@ -19,7 +19,6 @@ class AuthenticationService {
     if (user) {
       throw new Error('User with such email already exists.');
     } else {
-      // @ts-ignore
       const hashedPwd = await bcrypt.hash(userData.password as string, 10);
       const newUser = this.userRepository.create({
         ...userData,
@@ -29,7 +28,7 @@ class AuthenticationService {
       const accessToken = this.createAccessToken(tokenData);
       const refreshToken = this.createRefreshToken(tokenData);
       this.userRepository.merge(newUser, { refresh_token: refreshToken });
-      const result = this.userRepository.save(newUser);
+      const result = await this.userRepository.save(newUser);
       console.log(result);
       
       return { accessToken, refreshToken };

@@ -43,12 +43,9 @@ class UserService {
     try {
       const user = await this.userRepository.findOneBy({ id: userData.id });
       if (user) {
-        // @ts-ignore
-        const match = await bcrypt.compare(userData.password, user.password);
+        const match = await bcrypt.compare(userData.password as string, user.password);
         if (match) {
-          // @ts-ignore
-          const hashedNewPassword = await bcrypt.hash(userData.newPassword, 10); 
-          // @ts-ignore
+          const hashedNewPassword = await bcrypt.hash(userData.newPassword as string, 10); 
           this.userRepository.merge(user, { password: hashedNewPassword });
           const result = await this.userRepository.save(user);
           return result;
