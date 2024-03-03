@@ -10,10 +10,10 @@ class UserService {
   public async getUserData(userId: number) {
     try {
       const user = await this.userRepository.findOneBy({ id: userId });
-      if (!user) {
+      if (!user) { 
         throw new Error('No user with such ID.');
       } else {
-        return { name: user.name, email: user.email, country: user.country, phoneNum: user.phone_num, createdAt: user.created_at };
+        return { name: user.name, email: user.email, country: user.country, phoneNum: user.phone_num, profilePicture: user.profile_picture };
       }
     } catch (err) {
       console.log(err);
@@ -36,6 +36,23 @@ class UserService {
     } catch (err) {
       console.log(err);
       throw new Error('An unexpected error occurred while processing your request.');
+    }
+  }
+
+  public async setProfileImage(userId: number, imageUrl: string) {
+    try {
+      const user = await this.userRepository.findOneBy({ id: userId });
+      if (!user) {
+        throw new Error("No user with such ID.");
+      } else {
+        // @ts-ignore 
+        this.userRepository.merge(user, { profile_picture: imageUrl });
+        const result = await this.userRepository.save(user);
+        console.log('URL in db:', result.profile_picture);
+        return;
+      }
+    } catch (err) {
+      throw err;
     }
   }
 
