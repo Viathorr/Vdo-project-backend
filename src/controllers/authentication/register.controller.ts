@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import UserDto from "../../dto/user.dto";
+import { UserDto, UserDtoBuilder } from "../../dto/user.dto";
 import Controller from "../../interfaces/controller.interface";
 import AuthenticationService from "../../service/authentication.service";
 
@@ -7,6 +7,7 @@ class RegisterController implements Controller {
   public path: string = '/register';
   public router: Router = Router();
   private authenticationService: AuthenticationService = new AuthenticationService();
+  private userDtoBuilder: UserDtoBuilder = new UserDtoBuilder();
 
   constructor() {
     this.initializeRoutes();
@@ -21,14 +22,15 @@ class RegisterController implements Controller {
     console.log('registration request');
     const { name, email, password } = req.body;
     console.log(name, email, password);
-    // Checking if username, email and password are provided.
+    
     if (!name || !email || !password) {
       return res.status(400).json({ 'message': 'Username and password are required.' });
     }
    
-    const userData: UserDto = req.body;
     try {
-      const { accessToken, refreshToken } = await this.authenticationService.register(userData);
+      const { accessToken, refreshToken } = await this.authenticationService.register(
+        this.userDtoBuilder.addName(name).addEmail(email).addCurrPassword(password).build()
+      );
 
       res.cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'none', secure: true, maxAge: 7 * 24 * 60 * 60 * 1000 });
       

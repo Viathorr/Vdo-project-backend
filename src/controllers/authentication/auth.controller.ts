@@ -1,11 +1,13 @@
 import { Router, Request, Response } from "express";
 import Controller from "../../interfaces/controller.interface";
 import AuthenticationService from "../../service/authentication.service";
+import { UserDtoBuilder } from "../../dto/user.dto";
 
 class AuthController implements Controller {
   public path: string = '/auth';
   public router: Router = Router();
   private authenticationService: AuthenticationService = new AuthenticationService();
+  private userDtoBuilder: UserDtoBuilder = new UserDtoBuilder();
 
   constructor() {
     this.initializeRoutes();
@@ -26,7 +28,9 @@ class AuthController implements Controller {
     }
     
     try {
-      const { accessToken, refreshToken } = await this.authenticationService.login(req.body);
+      const { accessToken, refreshToken } = await this.authenticationService.login(
+        this.userDtoBuilder.addEmail(email).addCurrPassword(password).build()
+      );
 
       res.cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'none', secure: true, maxAge: 7 * 24 * 60 * 60 * 1000 });
 

@@ -1,4 +1,4 @@
-import UserDto from "../dto/user.dto";
+import  { UserDto, UserDtoBuilder } from "../dto/user.dto";
 import AppDataSource from "../config/mysqlConn";
 import { User } from "../entity/user.entity";
 import bcrypt from 'bcrypt';
@@ -6,14 +6,17 @@ import bcrypt from 'bcrypt';
 
 class UserService {
   private userRepository = AppDataSource.getRepository(User);
+  private userDtoBuilder: UserDtoBuilder = new UserDtoBuilder();
 
-  public async getUserData(userId: number) {
+  public async getUserData(userData: UserDto): Promise<UserDto> {
     try {
-      const user = await this.userRepository.findOneBy({ id: userId });
+      console.log('user id:', userData.id);
+      const user = await this.userRepository.findOneBy({ id: userData.id });
+      console.log('user:', user);
       if (!user) { 
         throw new Error('No user with such ID.');
       } else {
-        return { name: user.name, email: user.email, country: user.country, phoneNum: user.phone_num, profilePicture: user.profile_picture };
+        return this.userDtoBuilder.addName(user.name).addEmail(user.email).addCountry(user.country).addPhoneNum(user.phone_num).addProfilePicture(user.profile_picture).build();
       }
     } catch (err) {
       console.log(err);
@@ -60,9 +63,10 @@ class UserService {
     try {
       const user = await this.userRepository.findOneBy({ id: userData.id });
       if (user) {
-        const match = await bcrypt.compare(userData.password as string, user.password);
+        const match = await bcrypt.compare(userData.currPassword as string, user.password);
         if (match) {
           const hashedNewPassword = await bcrypt.hash(userData.newPassword as string, 10); 
+          console.log('new hashed password:', hashedNewPassword);
           this.userRepository.merge(user, { password: hashedNewPassword });
           const result = await this.userRepository.save(user);
           return result;
@@ -77,14 +81,14 @@ class UserService {
     }
   }
 
-  public async deleteUser(id: number) {
+  public async deleteUser(userData: UserDto) {
     try {
-      const user = await this.userRepository.findOneBy({ id });
+      const user = await this.userRepository.findOneBy({ id: userData.id });
       if (user) {
-        const res = await this.userRepository.delete({ id });
+        const res = await this.userRepository.delete({ id: userData.id });
         return res.affected ? 'Success' : 'Fail';
       } else {
-        throw new Error('No user with such ID exosts.');
+        throw new Error('No user with such ID exists.');
       }
     } catch (err) {
       throw new Error(err instanceof Error ? err.message : 'Unexpected error occurred');

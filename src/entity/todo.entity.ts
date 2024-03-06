@@ -18,7 +18,7 @@ export class Todo extends BaseEntity {
     type: 'datetime',
     nullable: true
   })
-  deadline: string;
+  deadline: string; // TODO change data type if needed (to Date)
 
   @CreateDateColumn()
   created_at: Date;

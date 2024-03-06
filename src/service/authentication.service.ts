@@ -1,4 +1,4 @@
-import UserDto from "../dto/user.dto";
+import { UserDto } from "../dto/user.dto";
 import AppDataSource from "../config/mysqlConn";
 import { User } from "../entity/user.entity";
 import bcrypt from 'bcrypt';
@@ -19,7 +19,7 @@ class AuthenticationService {
     if (user) {
       throw new Error('User with such email already exists.');
     } else {
-      const hashedPwd = await bcrypt.hash(userData.password as string, 10);
+      const hashedPwd = await bcrypt.hash(userData.currPassword as string, 10);
       const newUser = this.userRepository.create({
         ...userData,
         password: hashedPwd
@@ -38,7 +38,7 @@ class AuthenticationService {
   public async login(userData: UserDto): Promise<jwtTokens> {
     const user = await this.userRepository.findOneBy({ email: userData.email });
     if (user) {
-      const match = await bcrypt.compare(userData.password as string, user.password);
+      const match = await bcrypt.compare(userData.currPassword as string, user.password);
       if (match) {
         const tokenData: TokenData = { id: user.id };
         const refreshToken = this.createRefreshToken(tokenData);

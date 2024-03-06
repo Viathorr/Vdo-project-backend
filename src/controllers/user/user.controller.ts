@@ -2,7 +2,7 @@ import { Response, Router } from "express";
 import Controller from "../../interfaces/controller.interface";
 import RequestWithUserId from "../../interfaces/requestWithUserId.interface";
 import UserService from "../../service/user.service";
-import UserDto from "../../dto/user.dto";
+import { UserDto, UserDtoBuilder } from "../../dto/user.dto";
 import multer from 'multer';
 import { v4 } from 'uuid';
 import fs from 'fs';
@@ -22,6 +22,7 @@ class UserController implements Controller {
   public router: Router = Router();
   private userService: UserService = new UserService();
   private bucket = getStorage().bucket();
+  private userDtoBuilder: UserDtoBuilder = new UserDtoBuilder();
 
   private storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -62,24 +63,26 @@ class UserController implements Controller {
   private getUserInfo = async (req: RequestWithUserId, res: Response) => {
     console.log('Get user info request');
     try {
-      const user = await this.userService.getUserData(req.id);
-      // console.log(user);
+      console.log('user id:', req.id);
+      const user: UserDto = await this.userService.getUserData(this.userDtoBuilder.addId(req.id).build());
       return res.status(200).json(user);
     } catch (err) {
       console.log(err);
-      return res.sendStatus(err instanceof Error ? err.message === 'No user with such ID.' ? 401 : 500 : 404);
+      return res.sendStatus(404);
     }
   } 
 
   private changeUserInfo = async (req: RequestWithUserId, res: Response) => {
     console.log('Change user info request');
-    if (!req.body?.name && !req.body?.country && !req.body?.phoneNum && !req.body?.profileImage) {
+    const { name, country, phoneNum } = req.body;
+    if (!name && !country && !phoneNum) {
       console.log('No user info to update');
       return res.sendStatus(204);
     }
-    const userData: UserDto = { id: req.id, ...req.body };
     try {
-      const result = await this.userService.changeUserData(userData);
+      const result = await this.userService.changeUserData(
+        this.userDtoBuilder.addId(req.id).addName(name).addCountry(country).addPhoneNum(phoneNum).build()
+      );
       console.log("Changing username result: ", result);
       return res.status(200).json({ message: "Success" });
     } catch (err) {
@@ -135,12 +138,14 @@ class UserController implements Controller {
   
   private changePassword = async (req: RequestWithUserId, res: Response) => {
     console.log('Change password request');
-    if (!req.body?.currPassword || !req.body?.newPassword) {
+    const { currPassword, newPassword } = req.body;
+    if (!currPassword || !newPassword) {
       return res.sendStatus(204);
     }
-    const userData: UserDto = { id: req.id, password: req.body.currPassword, newPassword: req.body.newPassword };
     try {
-      const result = await this.userService.changePassword(userData);
+      const result = await this.userService.changePassword(
+        this.userDtoBuilder.addId(req.id).addCurrPassword(currPassword).addNewPassword(newPassword).build()
+      );
       console.log("Changing password result: ", result);
       return res.status(201).json({ message: 'Success' });
     } catch (err) {
@@ -152,7 +157,7 @@ class UserController implements Controller {
   private deleteAccount = async (req: RequestWithUserId, res: Response) => {
     console.log('Delete account request');
     try {
-      const result = await this.userService.deleteUser(req.id);
+      const result = await this.userService.deleteUser(this.userDtoBuilder.addId(req.id).build());
       
       res.clearCookie('refreshToken', { httpOnly: true, sameSite: 'none', secure: true, maxAge: 24 * 60 * 60 * 1000 });
       return res.status(200).json({ message: result });
