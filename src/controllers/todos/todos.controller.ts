@@ -60,6 +60,7 @@ class TodosController implements Controller {
       return res.status(400).json({ 'message': 'Todo ID is required.' });
     }
     // The only thing that can be changed is 'checked' property
+    // Later I'll add 'deadline' property, which can be changed as well
     if (!('checked' in req.body)) {
       return res.sendStatus(204);
     }

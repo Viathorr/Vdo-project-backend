@@ -1,7 +1,8 @@
 import { IsEmail } from "class-validator";
 import { Todo } from './todo.entity';
 import { Entity, Column, CreateDateColumn, UpdateDateColumn, OneToMany, BaseEntity, PrimaryGeneratedColumn } from "typeorm";
-
+import { Activity } from "./activity.entity";
+ 
 @Entity()
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
@@ -54,4 +55,10 @@ export class User extends BaseEntity {
     todo => todo.creator
   )
   todos: Todo[];
+  
+  @OneToMany(
+    () => Activity,
+    activity => activity.creator
+  )
+  activities: Activity[];
 }

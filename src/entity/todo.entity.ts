@@ -14,6 +14,12 @@ export class Todo extends BaseEntity {
   })
   checked: boolean;
 
+  @Column({
+    type: 'datetime',
+    nullable: true
+  })
+  deadline: string;
+
   @CreateDateColumn()
   created_at: Date;
 
