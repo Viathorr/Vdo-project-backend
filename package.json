@@ -26,6 +26,7 @@
     "@types/mysql": "^2.15.25",
     "@types/node": "^20.11.6",
     "ts-node-dev": "^2.0.0",
+    "typedoc": "^0.25.11",
     "typescript": "^5.3.3"
   },
   "dependencies": {

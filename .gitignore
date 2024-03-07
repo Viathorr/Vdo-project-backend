@@ -2,3 +2,4 @@
 .env
 /src/keys
 /src/uploaded_files
+/docs
