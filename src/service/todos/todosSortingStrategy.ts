@@ -7,6 +7,7 @@ export interface TodosSortingStrategy {
     sort(todos: Todo[]): Todo[];
 }
 
+
 abstract class ATodosSortingStrategy implements TodosSortingStrategy {
     protected todosFilter: TodosFilter | null;
 
@@ -25,6 +26,7 @@ export class TodosSortingByNameStrategy extends ATodosSortingStrategy {
         return todos;
     }
 }
+
 
 export class TodosSortingByDateStrategy extends ATodosSortingStrategy {
     public sort(todos: Todo[]): Todo[] {

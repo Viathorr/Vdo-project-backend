@@ -2,7 +2,7 @@ import { Todo } from "../../entity/todo.entity";
 import { Request, Response, Router } from "express";
 import Controller from "../../interfaces/controller.interface";
 import RequestWithUserId from "../../interfaces/requestWithUserId.interface";
-import TodosService from "../../service/todos/todos.service";
+import TodosService, {getResult} from "../../service/todos/todos.service";
 import { TodoDtoBuilder } from "../../dto/todo.dto";
 import {
   TodosSortingByDateStrategy,
@@ -38,7 +38,7 @@ class TodosController implements Controller {
   // you can access them by req.query property, e.x. const sortBy = req.query.s;
   private getTodos = async (req: RequestWithUserId, res: Response) => {
     console.log('Get todos request\n');
-    const page: number = parseInt(req.query.page as string) || 0;
+    const page: number = parseInt(req.query.page as string) || 1;
     const limit: number = parseInt(req.query.limit as string) || 5;
     const sort: string = req.query.s as string || 'name';
     const filter: string = req.query.f as string || 'all';
@@ -58,11 +58,11 @@ class TodosController implements Controller {
 
     this.todosService.setTodosSortingStrategy(sortingStrategy);
 
-    const todos: Todo[] = await this.todosService.getAllTodos(req.id);
-    if (!todos?.length) {
+    const result: getResult = await this.todosService.getAllTodos(req.id, page, limit);
+    if (!result.todos?.length) {
       return res.status(204).json({ 'message': 'No todos were found.' });
     }
-    return res.json(todos);
+    return res.json(result);
   }
 
   private addTodo = async (req: RequestWithUserId, res: Response) => {

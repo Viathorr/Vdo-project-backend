@@ -4,6 +4,11 @@ import { Todo } from "../../entity/todo.entity";
 import {TodosSortingStrategy} from "./todosSortingStrategy";
 import {DeleteResult, InsertResult, Repository} from "typeorm";
 
+export type getResult = {
+  prevPage?: number,
+  nextPage?: number,
+  todos: Todo[]
+};
 
 class TodosService {
   private todoRepository: Repository<Todo> = AppDataSource.getRepository(Todo);
@@ -13,11 +18,26 @@ class TodosService {
     this.todosSortingStrategy = sortingStrategy;
   }
 
-  public async getAllTodos(userId: number): Promise<Todo[]> {
+  public async getAllTodos(userId: number, pageNum: number, limit: number) {
     try {
-      const todos: Todo[] = await this.todoRepository.createQueryBuilder('todos').where('user_id = :userId', { userId }).getMany();
-      this.todosSortingStrategy.sort(todos);
-      return todos;
+      let todos: Todo[] = await this.todoRepository.createQueryBuilder('todos').where('user_id = :userId',
+          { userId }).getMany();
+      let result: getResult = {
+        todos
+      };
+      if (todos.length > 0) {
+        todos = this.todosSortingStrategy.sort(todos);
+        const startIndex: number = (pageNum - 1) * limit;
+        const endIndex: number = pageNum * limit;
+        if (startIndex > 0) {
+          result.prevPage = pageNum - 1;
+        }
+        if (endIndex < todos.length) {
+          result.nextPage = pageNum + 1;
+        }
+        result.todos = todos.slice(startIndex, endIndex);
+      }
+      return result;
     } catch (err) {
       console.log(err);
       throw new Error('An unexpected error occurred while processing your request.');
@@ -48,7 +68,7 @@ class TodosService {
       return await this.todoRepository.save(todo);
     } catch (err) {
       console.log(err);
-      throw new Error('An unexpected error occurred while processing your request.');
+      throw err;
     }
   }
  
@@ -67,9 +87,9 @@ class TodosService {
       }
     } catch (err) {
       console.log(err);
-      throw new Error('An unexpected error occurred while processing your request.');
+      throw err;
     }
   }
-};
+}
 
 export default TodosService;
