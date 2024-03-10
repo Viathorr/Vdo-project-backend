@@ -3,7 +3,7 @@ import AppDataSource from "../../config/mysqlConn";
 import { Todo } from "../../entity/todo.entity";
 import {TodosSortingStrategy} from "./todosSortingStrategy";
 import {DeleteResult, InsertResult, Repository} from "typeorm";
-
+ 
 export type getResult = {
   prevPage?: number,
   nextPage?: number,
@@ -47,23 +47,27 @@ class TodosService {
   public async addTodo(todoData: TodoDto) {
     try {
       const todo: InsertResult = await this.todoRepository.createQueryBuilder('todo').insert().into(Todo).values({
-        name: todoData.name, creator: {
+        name: todoData.name,
+        deadline: todoData.deadline,
+        creator: {
           id: todoData.userId
         }
       }).execute();
       return todo.generatedMaps[0];
     } catch (err) {
+      console.log(err);
       throw new Error('An unexpected error occurred while processing your request.');
     }
   }
 
+  // TODO add a checking for the user's id
   public async updateTodo(todoData: TodoDto) {
     try {
       const todo: Todo | null = await this.todoRepository.findOneBy({ id: todoData.id });
       if (!todo) {
         throw new Error(`No todo matches ID ${todoData.id}.`);
       }
-      
+
       this.todoRepository.merge(todo, todoData);
       return await this.todoRepository.save(todo);
     } catch (err) {
@@ -71,7 +75,8 @@ class TodosService {
       throw err;
     }
   }
- 
+
+  // TODO add a checking for the user's id
   public async deleteTodo(todoData: TodoDto) {
     try {
       const todo: Todo | null = await this.todoRepository.findOneBy({ id: todoData.id });

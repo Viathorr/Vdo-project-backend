@@ -39,7 +39,7 @@ class TodosController implements Controller {
   private getTodos = async (req: RequestWithUserId, res: Response) => {
     console.log('Get todos request\n');
     const page: number = parseInt(req.query.page as string) || 1;
-    const limit: number = parseInt(req.query.limit as string) || 5;
+    const limit: number = parseInt(req.query.limit as string) || 6;
     const sort: string = req.query.s as string || 'name';
     const filter: string = req.query.f as string || 'all';
 
@@ -67,15 +67,17 @@ class TodosController implements Controller {
 
   private addTodo = async (req: RequestWithUserId, res: Response) => {
     console.log('Add todo request.\n');
-    const { name } = req.body;
+    
+    const { name, deadline } = req.body;
     if (!name) {
       return res.status(400).json({ 'message': 'Todo name is required.' });
     }
     try {
       const todo = await this.todosService.addTodo(
-        this.todoDtoBuilder.addUserId(req.id).addName(name).build()
+        this.todoDtoBuilder.addUserId(req.id).addName(name).addDeadline(deadline).build()
       );
       return res.status(201).json(todo);
+      // return res.sendStatus(201);
     } catch (err) {
       console.error(err);
       return res.status(500).json({ 'message': err instanceof Error ? err.message : 'An unexpected error occurred while processing your request.' });
