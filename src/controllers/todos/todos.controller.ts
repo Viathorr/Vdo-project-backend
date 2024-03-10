@@ -29,7 +29,7 @@ class TodosController implements Controller {
       // @ts-ignore
       .post(this.addTodo);
     
-    this.router.route(`${this.path}/:id`)
+    this.router.route(this.path)
       .put(this.updateTodo)
       .delete(this.deleteTodo);
   }
@@ -67,7 +67,7 @@ class TodosController implements Controller {
 
   private addTodo = async (req: RequestWithUserId, res: Response) => {
     console.log('Add todo request.\n');
-    
+     
     const { name, deadline } = req.body;
     if (!name) {
       return res.status(400).json({ 'message': 'Todo name is required.' });
@@ -84,20 +84,30 @@ class TodosController implements Controller {
     }
   }
 
+  // http://localhost:3000/todos?id=:id
+  // TODO add a checking for the user's id
   private updateTodo = async (req: Request, res: Response) => {
     console.log('Update todo request.\n');
-    if (!req.params?.id) {
+    if (!req.query?.id) {
       return res.status(400).json({ 'message': 'Todo ID is required.' });
     }
-    // The only thing that can be changed is 'checked' property
-    // Later I'll add 'deadline' property, which can be changed as well
-    if (!('checked' in req.body)) {
+    let todo;
+    const { checked, name, deadline } = req.body;
+    // Name, checked property or deadline can be changed
+    if (!('checked' in req.body) && !name && !deadline) {
       return res.sendStatus(204);
     }
+
+    if ('checked' in req.body) {
+      // if todo was updated by clicking on checkbox, then the request will contain only 'checked' value
+      todo = this.todoDtoBuilder.addId(Number(req.query.id)).addChecked(checked).build();
+    } else {
+      // if todo info(name, deadline) was updated, then the request will contain only todo name and deadline with no 'checked' value
+      todo = this.todoDtoBuilder.addId(Number(req.query.id)).addName(name).addDeadline(deadline).build();
+    }
+
     try {
-      const result = await this.todosService.updateTodo(
-        this.todoDtoBuilder.addId(Number(req.params.id)).addChecked(req.body.checked).build()
-      );
+      const result = await this.todosService.updateTodo(todo);
 
       return res.json(result);
     } catch (err) {
@@ -106,14 +116,16 @@ class TodosController implements Controller {
     }
   }
 
+  // http://localhost:3000/todos?id=:id
+  // TODO add a checking for the user's id
   private deleteTodo = async (req: Request, res: Response) => {
     console.log('Delete todo request.\n');
-    if (!req.params?.id) {
+    if (!req.query?.id) {
       return res.status(400).json({ 'message': 'Todo ID is required.' });
     }
     try {
       const result = await this.todosService.deleteTodo(
-        this.todoDtoBuilder.addId(Number(req.params.id)).build()
+        this.todoDtoBuilder.addId(Number(req.query.id)).build()
       );
       return res.json(result);
     } catch (err) {
