@@ -30,7 +30,9 @@ class TodosController implements Controller {
       .post(this.addTodo);
     
     this.router.route(this.path)
+      // @ts-ignore
       .put(this.updateTodo)
+      // @ts-ignore
       .delete(this.deleteTodo);
   }
 
@@ -86,7 +88,7 @@ class TodosController implements Controller {
 
   // http://localhost:3000/todos?id=:id
   // TODO add a checking for the user's id
-  private updateTodo = async (req: Request, res: Response) => {
+  private updateTodo = async (req: RequestWithUserId, res: Response) => {
     console.log('Update todo request.\n');
     if (!req.query?.id) {
       return res.status(400).json({ 'message': 'Todo ID is required.' });
@@ -100,10 +102,10 @@ class TodosController implements Controller {
 
     if ('checked' in req.body) {
       // if todo was updated by clicking on checkbox, then the request will contain only 'checked' value
-      todo = this.todoDtoBuilder.addId(Number(req.query.id)).addChecked(checked).build();
+      todo = this.todoDtoBuilder.addId(Number(req.query.id)).addChecked(checked).addUserId(req.id).build();
     } else {
       // if todo info(name, deadline) was updated, then the request will contain only todo name and deadline with no 'checked' value
-      todo = this.todoDtoBuilder.addId(Number(req.query.id)).addName(name).addDeadline(deadline).build();
+      todo = this.todoDtoBuilder.addId(Number(req.query.id)).addName(name).addDeadline(deadline).addUserId(req.id).build();
     }
 
     try {
@@ -118,14 +120,14 @@ class TodosController implements Controller {
 
   // http://localhost:3000/todos?id=:id
   // TODO add a checking for the user's id
-  private deleteTodo = async (req: Request, res: Response) => {
+  private deleteTodo = async (req: RequestWithUserId, res: Response) => {
     console.log('Delete todo request.\n');
     if (!req.query?.id) {
       return res.status(400).json({ 'message': 'Todo ID is required.' });
     }
     try {
       const result = await this.todosService.deleteTodo(
-        this.todoDtoBuilder.addId(Number(req.query.id)).build()
+        this.todoDtoBuilder.addId(Number(req.query.id)).addUserId(req.id).build()
       );
       return res.json(result);
     } catch (err) {

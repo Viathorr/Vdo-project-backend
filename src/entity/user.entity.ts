@@ -38,6 +38,12 @@ export class User extends BaseEntity {
   })
   phone_num: string;
 
+  @Column({
+    nullable: true,
+    default: 0
+  })
+  completed_todos: number;
+
   @CreateDateColumn()
   created_at: Date;
 

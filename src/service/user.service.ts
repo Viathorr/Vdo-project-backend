@@ -1,6 +1,7 @@
 import  { UserDto, UserDtoBuilder } from "../dto/user.dto";
 import AppDataSource from "../config/mysqlConn";
 import { User } from "../entity/user.entity";
+import { Todo } from "../entity/todo.entity";
 import bcrypt from 'bcrypt';
 
 
@@ -11,12 +12,18 @@ class UserService {
   public async getUserData(userData: UserDto): Promise<UserDto> {
     try {
       console.log('user id:', userData.id);
-      const user = await this.userRepository.findOneBy({ id: userData.id });
+      const user: User | null = await this.userRepository.findOneBy({ id: userData.id });
       console.log('user:', user);
       if (!user) { 
         throw new Error('No user with such ID.');
       } else {
-        return this.userDtoBuilder.addName(user.name).addEmail(user.email).addCountry(user.country).addPhoneNum(user.phone_num).addProfilePicture(user.profile_picture).build();
+        // TODO add count of left todos
+        const leftTodos = await AppDataSource.getRepository(Todo).createQueryBuilder()
+          .select()
+          .where("user_id = :userId", { userId: userData.id }) // Specify the user ID
+          .andWhere("checked = :checked", { checked: false }) // Check the 'checked' property
+          .getMany();
+        return this.userDtoBuilder.addName(user.name).addEmail(user.email).addCountry(user.country).addPhoneNum(user.phone_num).addProfilePicture(user.profile_picture).addCompletedTodos(user.completed_todos).addLeftTodos(leftTodos.length).build();
       }
     } catch (err) {
       console.log(err);

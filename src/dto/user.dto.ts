@@ -28,6 +28,18 @@ class UserDto {
   public profilePicture?: string;
 
   @IsOptional()
+  @IsNumber()
+  public completedTodos?: number;
+
+  @IsOptional()
+  @IsNumber()
+  public leftTodos?: number;
+
+  @IsOptional()
+  @IsNumber()
+  public askedQuestions?: number;
+
+  @IsOptional()
   @IsString()
   public currPassword?: string;
   
@@ -75,6 +87,22 @@ class UserDtoBuilder extends DtoBuilder<UserDto> {
     this.dto.phoneNum = phoneNum;
     return this;
   }
+
+  public addCompletedTodos = (todosCount: number) => {
+    this.dto.completedTodos = todosCount;
+    return this;
+  }
+  
+  public addLeftTodos = (todosCount: number) => {
+    this.dto.leftTodos = todosCount;
+    return this;
+  }
+  
+  public addAskedQuestions = (questionsCount: number) => {
+    this.dto.askedQuestions = questionsCount;
+    return this;
+  }
+  
 
   public addCurrPassword = (pwd: string) => {
     this.dto.currPassword = pwd;

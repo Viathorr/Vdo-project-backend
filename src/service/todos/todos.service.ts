@@ -1,6 +1,7 @@
 import { TodoDto } from "../../dto/todo.dto";
 import AppDataSource from "../../config/mysqlConn";
 import { Todo } from "../../entity/todo.entity";
+import { User } from "../../entity/user.entity";
 import {TodosSortingStrategy} from "./todosSortingStrategy";
 import {DeleteResult, InsertResult, Repository} from "typeorm";
  
@@ -60,15 +61,28 @@ class TodosService {
     }
   }
 
-  // TODO add a checking for the user's id
+  // TODO add decrement completed todos property in user table if the todo is being unchecked
   public async updateTodo(todoData: TodoDto) {
     try {
       const todo: Todo | null = await this.todoRepository.findOneBy({ id: todoData.id });
       if (!todo) {
         throw new Error(`No todo matches ID ${todoData.id}.`);
       }
+      // else if (todo.creator !== todoData.userId) {
+      //   throw new Error(`No todo of ID ${todoData.id} matches user of ID ${todoData.userId}.`);
+      // }
+      console.log(todo.creator);
+
+      const user = await AppDataSource.getRepository(User).findOneBy({ id: todoData.userId });
+      if (!user) {
+        throw new Error(`User of ID ${todoData.userId} doesn't exist.`);
+      }
+
+      user.completed_todos++;
+      await AppDataSource.getRepository(User).save(user);
 
       this.todoRepository.merge(todo, todoData);
+      
       return await this.todoRepository.save(todo);
     } catch (err) {
       console.log(err);
@@ -76,13 +90,15 @@ class TodosService {
     }
   }
 
-  // TODO add a checking for the user's id
   public async deleteTodo(todoData: TodoDto) {
     try {
       const todo: Todo | null = await this.todoRepository.findOneBy({ id: todoData.id });
       if (!todo) {
         throw new Error(`No todo matches ID ${todoData.id}.`);
       }
+      // else if (todo.creator.id !== todoData.userId) {
+      //   throw new Error(`No todo of ID ${todoData.id} matches user of ID ${todoData.userId}.`);
+      // }
       // @ts-ignore
       const result: DeleteResult = await this.todoRepository.delete(todoData.id);
       if (result.affected == 1) {
