@@ -64,14 +64,14 @@ class TodosService {
   // TODO add decrement completed todos property in user table if the todo is being unchecked
   public async updateTodo(todoData: TodoDto) {
     try {
-      const todo: Todo | null = await this.todoRepository.findOneBy({ id: todoData.id });
+      const todo: Todo | null = await this.todoRepository.findOne({
+        where: {
+          id: todoData.id,
+          creator: { id: todoData.userId }
+      }});
       if (!todo) {
         throw new Error(`No todo matches ID ${todoData.id}.`);
       }
-      // else if (todo.creator !== todoData.userId) {
-      //   throw new Error(`No todo of ID ${todoData.id} matches user of ID ${todoData.userId}.`);
-      // }
-      console.log(todo.creator);
 
       const user = await AppDataSource.getRepository(User).findOneBy({ id: todoData.userId });
       if (!user) {
@@ -85,20 +85,20 @@ class TodosService {
       
       return await this.todoRepository.save(todo);
     } catch (err) {
-      console.log(err);
       throw err;
     }
   }
 
   public async deleteTodo(todoData: TodoDto) {
     try {
-      const todo: Todo | null = await this.todoRepository.findOneBy({ id: todoData.id });
+      const todo: Todo | null = await this.todoRepository.findOne({
+        where: {
+          id: todoData.id,
+          creator: { id: todoData.userId }
+      }});
       if (!todo) {
         throw new Error(`No todo matches ID ${todoData.id}.`);
       }
-      // else if (todo.creator.id !== todoData.userId) {
-      //   throw new Error(`No todo of ID ${todoData.id} matches user of ID ${todoData.userId}.`);
-      // }
       // @ts-ignore
       const result: DeleteResult = await this.todoRepository.delete(todoData.id);
       if (result.affected == 1) {

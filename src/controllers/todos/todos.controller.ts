@@ -69,7 +69,7 @@ class TodosController implements Controller {
 
   private addTodo = async (req: RequestWithUserId, res: Response) => {
     console.log('Add todo request.\n');
-     
+    console.log('user id:', req.id);
     const { name, deadline } = req.body;
     if (!name) {
       return res.status(400).json({ 'message': 'Todo name is required.' });
@@ -87,7 +87,6 @@ class TodosController implements Controller {
   }
 
   // http://localhost:3000/todos?id=:id
-  // TODO add a checking for the user's id
   private updateTodo = async (req: RequestWithUserId, res: Response) => {
     console.log('Update todo request.\n');
     if (!req.query?.id) {
@@ -113,13 +112,11 @@ class TodosController implements Controller {
 
       return res.json(result);
     } catch (err) {
-      console.log(err);
       return res.status(404).json({ 'message': err instanceof Error ? err.message : 'An unexpected error occurred.' });
     }
   }
 
   // http://localhost:3000/todos?id=:id
-  // TODO add a checking for the user's id
   private deleteTodo = async (req: RequestWithUserId, res: Response) => {
     console.log('Delete todo request.\n');
     if (!req.query?.id) {

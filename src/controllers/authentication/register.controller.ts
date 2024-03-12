@@ -1,8 +1,8 @@
 import { Router, Request, Response } from "express";
-import { UserDto, UserDtoBuilder } from "../../dto/user.dto";
+import { UserDtoBuilder } from "../../dto/user.dto";
 import Controller from "../../interfaces/controller.interface";
 import AuthenticationService from "../../service/authentication.service";
-
+ 
 class RegisterController implements Controller {
   public path: string = '/register';
   public router: Router = Router();
