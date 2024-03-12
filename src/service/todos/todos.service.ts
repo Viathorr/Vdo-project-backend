@@ -61,7 +61,6 @@ class TodosService {
     }
   }
 
-  // TODO add decrement completed todos property in user table if the todo is being unchecked
   public async updateTodo(todoData: TodoDto) {
     try {
       const todo: Todo | null = await this.todoRepository.findOne({
@@ -72,13 +71,17 @@ class TodosService {
       if (!todo) {
         throw new Error(`No todo matches ID ${todoData.id}.`);
       }
-
+ 
       const user = await AppDataSource.getRepository(User).findOneBy({ id: todoData.userId });
       if (!user) {
         throw new Error(`User of ID ${todoData.userId} doesn't exist.`);
       }
 
-      user.completed_todos++;
+      if (todoData.checked) {
+        user.completed_todos++;
+      } else {
+        user.completed_todos--;
+      }
       await AppDataSource.getRepository(User).save(user);
 
       this.todoRepository.merge(todo, todoData);
