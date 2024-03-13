@@ -2,6 +2,10 @@ import { IsEmail } from "class-validator";
 import { Todo } from './todo.entity';
 import { Entity, Column, CreateDateColumn, UpdateDateColumn, OneToMany, BaseEntity, PrimaryGeneratedColumn } from "typeorm";
 import { Activity } from "./activity.entity";
+import { Post } from "./communication-feed/post.entity";
+import { Comment } from "./communication-feed/comment.entity";
+import { Like } from "./communication-feed/like.entity";
+import { Saved } from "./communication-feed/saved.entity";
  
 @Entity()
 export class User extends BaseEntity {
@@ -67,4 +71,28 @@ export class User extends BaseEntity {
     activity => activity.creator
   )
   activities: Activity[];
+  
+  @OneToMany(
+    () => Post,
+    post => post.user
+  )
+  posts: Post[];
+  
+  @OneToMany(
+    () => Comment,
+    comment => comment.user
+  )
+  comments: Comment[];
+  
+  @OneToMany(
+    () => Like,
+    like => like.user
+  )
+  likes: Like[];
+  
+  @OneToMany(
+    () => Saved,
+    saved => saved.user
+  )
+  savedPosts: Saved[];
 }
