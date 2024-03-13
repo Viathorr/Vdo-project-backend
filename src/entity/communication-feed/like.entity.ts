@@ -2,6 +2,9 @@ import { Entity, Column, CreateDateColumn, BaseEntity, PrimaryGeneratedColumn, M
 import { User } from "../user.entity";
 import { Post } from "./post.entity";
 
+/**
+ * Represents user's like entity.
+ */
 @Entity()
 export class Like extends BaseEntity {
   @PrimaryGeneratedColumn()

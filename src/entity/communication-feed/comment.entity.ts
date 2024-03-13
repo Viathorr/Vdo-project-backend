@@ -1,6 +1,9 @@
 import { Entity, Column, CreateDateColumn, BaseEntity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from "typeorm";
 import { User } from "../user.entity";
 
+/**
+ * Represents a user's comment entity.
+ */
 @Entity()
 export class Comment extends BaseEntity {
   @PrimaryGeneratedColumn()

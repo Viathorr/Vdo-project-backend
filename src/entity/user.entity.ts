@@ -7,6 +7,9 @@ import { Comment } from "./communication-feed/comment.entity";
 import { Like } from "./communication-feed/like.entity";
 import { Saved } from "./communication-feed/saved.entity";
  
+/**
+ * Represents a user entity.
+ */
 @Entity()
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn()

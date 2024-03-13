@@ -1,6 +1,9 @@
 import { Entity, Column, CreateDateColumn, UpdateDateColumn, BaseEntity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from "typeorm";
 import { User } from "./user.entity";
 
+/**
+ * Represents a user's todo entity.
+ */
 @Entity()
 export class Todo extends BaseEntity {
   @PrimaryGeneratedColumn()
@@ -26,6 +29,9 @@ export class Todo extends BaseEntity {
   @UpdateDateColumn()
   update_at: Date;
 
+  /**
+   * User that has created todo.
+   */
   @ManyToOne(
     () => User,
     user => user.todos,

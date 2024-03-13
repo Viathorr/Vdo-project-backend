@@ -1,6 +1,9 @@
 import { Entity, Column, ManyToOne, JoinColumn, BaseEntity, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./user.entity";
 
+/**
+ * Represents user's activity entity.
+ */
 @Entity()
 export class Activity extends BaseEntity {
   @PrimaryGeneratedColumn()

@@ -3,6 +3,9 @@ import { User } from "../user.entity";
 import { Like } from "./like.entity";
 import { Saved } from "./saved.entity";
 
+/**
+ * Represents user's post entity.
+ */
 @Entity()
 export class Post extends BaseEntity {
   @PrimaryGeneratedColumn()

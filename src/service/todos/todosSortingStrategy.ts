@@ -33,7 +33,7 @@ export class TodosSortingByDateStrategy extends ATodosSortingStrategy {
         todos = this.todosFilter ? this.todosFilter.filter(todos) : todos;
         todos.sort((a: Todo, b: Todo) => {
             if (a.checked && (!b.checked || b.checked)) {
-                return -1; // a comes first if it's checked and b is not
+                return -1; // a comes first if it's checked
             } else if (!a.checked && b.checked) {
                 return 1; // b comes first if it's checked and a is not
             } else if (!a.deadline && (!b.deadline || b.deadline)) {

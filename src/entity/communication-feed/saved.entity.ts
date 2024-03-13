@@ -2,6 +2,9 @@ import { Entity, CreateDateColumn, BaseEntity, PrimaryGeneratedColumn, ManyToOne
 import { User } from "../user.entity";
 import { Post } from "./post.entity";
 
+/**
+ * Represents user's saved posts entity.
+ */
 @Entity()
 export class Saved extends BaseEntity {
   @PrimaryGeneratedColumn()
