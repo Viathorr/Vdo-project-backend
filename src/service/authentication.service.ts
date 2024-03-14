@@ -5,15 +5,23 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import TokenData from "../interfaces/tokenData.interface";
 
-
 type jwtTokens = {
   accessToken: string,
   refreshToken: string
 };
 
+/**
+ * Service class for managing user authentication operations.
+ */
 class AuthenticationService {
   private userRepository = AppDataSource.getRepository(User);
 
+  /**
+   * Registers a new user.
+   * @param userData The user DTO containing user data for registration.
+   * @returns A promise that resolves to JWT tokens upon successful registration.
+   * @throws Error if a user with the provided email already exists or some error occurred during the database query processing.
+   */
   public async register(userData: UserDto): Promise<jwtTokens> {
     const user = await this.userRepository.findOneBy({ email: userData.email });
     if (user) {
@@ -33,6 +41,12 @@ class AuthenticationService {
     }
   }
 
+  /**
+   * Logs in a user.
+   * @param userData The user DTO containing user data for login.
+   * @returns A promise that resolves to JWT tokens upon successful login.
+   * @throws Error if no user with the provided email exists or passwords do not match, or some error occurred during the database query processing.
+   */
   public async login(userData: UserDto): Promise<jwtTokens> {
     const user = await this.userRepository.findOneBy({ email: userData.email });
     if (user) {
@@ -52,6 +66,12 @@ class AuthenticationService {
     }
   }
 
+  /**
+   * Logs out a user.
+   * @param refreshToken The refresh token of the user to be logged out.
+   * @returns A promise that resolves to a boolean indicating successful logout.
+   * @throws Error if some error occurred during the database query processing.
+   */
   public async logout(refreshToken: string): Promise<boolean> {
     try {
       const user = await this.userRepository.findOneBy({ refresh_token: refreshToken });
@@ -68,6 +88,12 @@ class AuthenticationService {
     }
   }
 
+  /**
+   * Refreshes the access token using the provided refresh token.
+   * @param prevRefreshToken The previous refresh token used for refreshing.
+   * @returns A promise that resolves to JWT tokens upon successful token refresh.
+   * @throws Error if the user associated with the refresh token is not found or an error occurs during token verification, or some error occurred during the database query processing.
+   */
   public async refreshToken(prevRefreshToken: string): Promise<jwtTokens> {
     const foundUser = await this.userRepository.findOneBy({ refresh_token: prevRefreshToken });
     if (!foundUser) {
@@ -94,6 +120,11 @@ class AuthenticationService {
     }
   }
 
+  /**
+   * Generates a new JWT Access Token.
+   * @param tokenData Data to be included in token payload.
+   * @returns Generated JWT Access Token.
+   */
   private createAccessToken(tokenData: TokenData): string {
     const secret = process.env.ACCESS_TOKEN_SECRET as string;
     const accessToken = jwt.sign(
@@ -105,6 +136,11 @@ class AuthenticationService {
     return accessToken;
   }
 
+  /**
+   * Generates a new JWT Refresh Token.
+   * @param tokenData Data to be included in token payload.
+   * @returns Generated JWT Refresh Token.
+   */
   private createRefreshToken(tokenData: TokenData): string {
     const secret = process.env.REFRESH_TOKEN_SECRET as string;
     const refreshToken = jwt.sign(

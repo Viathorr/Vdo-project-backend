@@ -4,11 +4,19 @@ import { User } from "../entity/user.entity";
 import { Todo } from "../entity/todo.entity";
 import bcrypt from 'bcrypt';
 
-
+/**
+ * Service class for managing user-related operations.
+ */
 class UserService {
   private userRepository = AppDataSource.getRepository(User);
   private userDtoBuilder: UserDtoBuilder = new UserDtoBuilder();
 
+  /**
+   * Retrieves user data based on the provided user DTO(contains user id).
+   * @param userData The user DTO containing user data (id).
+   * @returns A promise that resolves to a user DTO.
+   * @throws Error if no user with the specified ID is found or some error occurred during the database query processing.
+   */
   public async getUserData(userData: UserDto): Promise<UserDto> {
     try {
       console.log('user id:', userData.id);
@@ -31,6 +39,12 @@ class UserService {
     }
   }
 
+   /**
+   * Changes user data based on the provided user DTO.
+   * @param userData The user DTO containing updated user data.
+   * @returns A promise that resolves when the user data is successfully updated.
+   * @throws Error if no user with the specified ID is found or some error occurred during the database query processing.
+   */
   public async changeUserData(userData: UserDto) {
     try {
       const user = await this.userRepository.findOneBy({ id: userData.id });
@@ -49,9 +63,16 @@ class UserService {
     }
   }
 
-  public async setProfileImage(userId: number, imageUrl: string) {
+  /**
+   * Sets the profile image URL for the specified user ID.
+   * @param userData The user DTO containing user data (id).
+   * @param imageUrl The URL of the new profile image.
+   * @returns A promise that resolves when the profile image URL is successfully updated.
+   * @throws Error if no user with the specified ID is found or some error occurred during the database query processing.
+   */
+  public async setProfileImage(userData: UserDto, imageUrl: string) {
     try {
-      const user = await this.userRepository.findOneBy({ id: userId });
+      const user = await this.userRepository.findOneBy({ id: userData.id });
       if (!user) {
         throw new Error("No user with such ID.");
       } else {
@@ -66,6 +87,12 @@ class UserService {
     }
   }
 
+  /**
+   * Changes the password for the specified user.
+   * @param userData The user DTO containing the user's ID and password information.
+   * @returns A promise that resolves when the password is successfully updated.
+   * @throws Error if the current password does not match the stored password or no user with the specified ID is found, or some error occurred during the database query processing.
+   */
   public async changePassword(userData: UserDto) {
     try {
       const user = await this.userRepository.findOneBy({ id: userData.id });
@@ -88,6 +115,12 @@ class UserService {
     }
   }
 
+  /**
+   * Deletes the user with the specified ID.
+   * @param userData The user DTO containing the ID of the user to be deleted.
+   * @returns A promise that resolves to a string indicating the result of the deletion operation ('Success' or 'Fail').
+   * @throws Error if no user with the specified ID is found or some error occurred during the database query processing.
+   */
   public async deleteUser(userData: UserDto) {
     try {
       const user = await this.userRepository.findOneBy({ id: userData.id });

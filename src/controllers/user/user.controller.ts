@@ -125,7 +125,7 @@ class UserController implements Controller {
       try {
         const downloadURL = await getDownloadURL(blob);
         console.log('Download URL:', downloadURL);
-        await this.userService.setProfileImage(req.id, downloadURL);
+        await this.userService.setProfileImage(this.userDtoBuilder.addId(req.id).build(), downloadURL);
         return res.json({ downloadURL });
       } catch (err: any) {
         console.log(err);

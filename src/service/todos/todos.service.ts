@@ -11,14 +11,29 @@ export type getResult = {
   todos: Todo[]
 };
 
+/**
+ * Service class for managing todo operations.
+ */
 class TodosService {
   private todoRepository: Repository<Todo> = AppDataSource.getRepository(Todo);
   private todosSortingStrategy: TodosSortingStrategy;
   
+  /**
+   * Sets the sorting strategy for todos.
+   * @param sortingStrategy The sorting strategy to be set.
+   */
   public setTodosSortingStrategy(sortingStrategy: TodosSortingStrategy): void {
     this.todosSortingStrategy = sortingStrategy;
   }
 
+  /**
+   * Retrieves all todos for a given user.
+   * @param userId The ID of the user.
+   * @param pageNum The page number.
+   * @param limit The maximum number of todos to retrieve per page.
+   * @returns An object containing todos and pagination information.
+   * @throws Error if some error occurred during the database query processing.
+   */
   public async getAllTodos(userId: number, pageNum: number, limit: number) {
     try {
       let todos: Todo[] = await this.todoRepository.createQueryBuilder('todos').where('user_id = :userId',
@@ -45,6 +60,12 @@ class TodosService {
     }
   }
 
+  /**
+   * Adds a new todo.
+   * @param todoData The todo DTO containing todo data to be added.
+   * @returns A promise that resolves to the newly added todo.
+   * @throws Error if some error occurred during the database query processing.
+   */
   public async addTodo(todoData: TodoDto) {
     try {
       const todo: InsertResult = await this.todoRepository.createQueryBuilder('todo').insert().into(Todo).values({
@@ -61,6 +82,12 @@ class TodosService {
     }
   }
 
+  /**
+   * Updates an existing todo.
+   * @param todoData The todo DTO containing todo data to be updated.
+   * @returns A promise that resolves to the updated todo.
+   * @throws Error if no todo with the specified ID is found or user ID doesn't match or some error occurred during the database query processing.
+   */
   public async updateTodo(todoData: TodoDto) {
     try {
       const todo: Todo | null = await this.todoRepository.findOne({
@@ -92,6 +119,12 @@ class TodosService {
     }
   }
 
+  /**
+   * Deletes an existing todo.
+   * @param todoData The todo DTO containing todo data to be deleted.
+   * @returns A promise that resolves to the result of the deletion operation.
+   * @throws Error if no todo with the specified ID is found or user ID doesn't match or some error occurred during the database query processing.
+   */
   public async deleteTodo(todoData: TodoDto) {
     try {
       const todo: Todo | null = await this.todoRepository.findOne({
