@@ -1,5 +1,4 @@
-import { Todo } from "../../entity/todo.entity";
-import { Request, Response, Router } from "express";
+import { Response, Router } from "express";
 import Controller from "../../interfaces/controller.interface";
 import RequestWithUserId from "../../interfaces/requestWithUserId.interface";
 import TodosService, {getResult} from "../../service/todos/todos.service";
@@ -27,9 +26,7 @@ class TodosController implements Controller {
       // @ts-ignore
       .get(this.getTodos)
       // @ts-ignore
-      .post(this.addTodo);
-    
-    this.router.route(this.path)
+      .post(this.addTodo)
       // @ts-ignore
       .put(this.updateTodo)
       // @ts-ignore
