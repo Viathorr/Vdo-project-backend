@@ -7,15 +7,28 @@ class LogoutController implements Controller {
   public router: Router = Router();
   private authenticationService: AuthenticationService = new AuthenticationService();
 
+  /**
+   * Creates an instance of LogoutController.
+   * Initializes routes.
+   */
   constructor() {
     this.initializeRoutes();
   }
 
+  /**
+   * Initializes routes for logout operation.
+   */
   private initializeRoutes() {
     this.router.route(this.path)
       .get(this.logout);
   }
  
+  /**
+   * Handles GET request to logout user.
+   * @param req Request object containing refresh token in cookies.
+   * @param res Response object for clearing cookies and sending appropriate status codes.
+   * @returns Resolves with status code 204 (No Content) or clears cookies and sends status code 204.
+   */
   private logout = async (req: Request, res: Response) => {
     console.log("In logout request");
     const refreshToken = req.cookies?.refreshToken;

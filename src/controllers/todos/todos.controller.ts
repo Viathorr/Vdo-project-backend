@@ -11,16 +11,26 @@ import {
 import { TodosActiveFilter, TodosCompletedFilter } from "../../service/todos/todosFilteringStrategy";
 
 
+/**
+ * Controller for handling todo-related operations.
+ */
 class TodosController implements Controller {
   public path: string = '/todos';
   public router: Router = Router();
   private todosService: TodosService = new TodosService();
   private todoDtoBuilder: TodoDtoBuilder = new TodoDtoBuilder();
   
+  /**
+   * Creates an instance of TodosController.
+   * Initializes routes.
+   */
   constructor() {
     this.initializeRoutes();
   }
 
+  /**
+   * Initializes routes for todo operations.
+   */
   private initializeRoutes(): void {
     this.router.route(this.path)
       // @ts-ignore
@@ -33,6 +43,12 @@ class TodosController implements Controller {
       .delete(this.deleteTodo);
   }
 
+  /**
+   * Handles GET request to retrieve todos.
+   * @param req Request object containing user ID, page, limit, sorting, and filtering parameters.
+   * @param res Response object for sending the retrieved todos.
+   * @returns Resolves with todos data or sends appropriate status codes.
+   */
   // URL: http://localhost:3500/todos?page=:page&limit=:limit&s=:sort&f=:filter
   private getTodos = async (req: RequestWithUserId, res: Response) => {
     console.log('Get todos request\n');
@@ -67,6 +83,12 @@ class TodosController implements Controller {
     }
   }
 
+  /**
+   * Handles POST request to add a new todo.
+   * @param req Request object containing user ID and todo details.
+   * @param res Response object for sending the added todo.
+   * @returns Resolves with the added todo or sends appropriate status codes.
+   */
   private addTodo = async (req: RequestWithUserId, res: Response) => {
     console.log('Add todo request.\n');
     const { name, deadline } = req.body;
@@ -85,6 +107,12 @@ class TodosController implements Controller {
     }
   }
 
+  /**
+   * Handles PUT request to update an existing todo.
+   * @param req Request object containing user ID, todo ID, and updated todo details.
+   * @param res Response object for sending the updated todo.
+   * @returns Resolves with the updated todo or sends appropriate status codes.
+   */
   // http://localhost:3000/todos?id=:id
   private updateTodo = async (req: RequestWithUserId, res: Response) => {
     console.log('Update todo request.\n');
@@ -115,6 +143,12 @@ class TodosController implements Controller {
     }
   }
 
+  /**
+   * Handles DELETE request to delete a todo.
+   * @param req Request object containing user ID and todo ID to be deleted.
+   * @param res Response object for sending the result of the deletion operation.
+   * @returns Resolves with the result of the deletion or sends appropriate status codes.
+   */
   // http://localhost:3000/todos?id=:id
   private deleteTodo = async (req: RequestWithUserId, res: Response) => {
     console.log('Delete todo request.\n');

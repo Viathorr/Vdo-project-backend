@@ -17,6 +17,9 @@ initializeApp({
 
 const imageUploadPath = process.env.UPLOADED_FILES_URL as string;
 
+/**
+ * Controller handling user-related routes.
+ */
 class UserController implements Controller {
   public path: string = '/user';
   public router: Router = Router();
@@ -24,6 +27,9 @@ class UserController implements Controller {
   private bucket = getStorage().bucket();
   private userDtoBuilder: UserDtoBuilder = new UserDtoBuilder();
 
+  /**
+   * Multer storage configuration for handling file uploads.
+   */
   private storage = multer.diskStorage({
     destination: function (req, file, cb) {
       cb(null, imageUploadPath)
@@ -33,12 +39,20 @@ class UserController implements Controller {
     }
   });
 
+  
   private imageUpload = multer({ storage: this.storage });
 
+  /**
+   * Creates an instance of UserController.
+   * Initializes routes.
+   */
   constructor() {
     this.initializeRoutes();
   }
 
+  /**
+   * Initialize routes for user-related endpoints.
+   */
   private initializeRoutes() {
     this.router.route(this.path)
       // @ts-ignore
@@ -60,6 +74,11 @@ class UserController implements Controller {
       .delete(this.deleteAccount);
   }
 
+  /**
+   * Handler for getting user information.
+   * @param req Express request object with user ID.
+   * @param res Express response object.
+   */
   private getUserInfo = async (req: RequestWithUserId, res: Response) => {
     console.log('Get user info request');
     try {
@@ -72,6 +91,11 @@ class UserController implements Controller {
     }
   } 
 
+  /**
+   * Handler for changing user information.
+   * @param req Express request object with user ID and updated information.
+   * @param res Express response object.
+   */
   private changeUserInfo = async (req: RequestWithUserId, res: Response) => {
     console.log('Change user info request');
     const { name, country, phoneNum } = req.body;
@@ -91,6 +115,11 @@ class UserController implements Controller {
     }
   };
 
+  /**
+   * Handler for changing user profile image.
+   * @param req Express request object with user ID and uploaded image file.
+   * @param res Express response object.
+   */
   // @ts-ignore
   private changeProfileImage = async (req: RequestWithUserId, res: Response) => {
     console.log('Change user profile image request');
@@ -136,6 +165,11 @@ class UserController implements Controller {
     fs.createReadStream(file.path).pipe(blobStream);
   };
   
+  /**
+   * Handler for changing user password.
+   * @param req Express request object with user ID and new passwords.
+   * @param res Express response object.
+   */
   private changePassword = async (req: RequestWithUserId, res: Response) => {
     console.log('Change password request');
     const { currPassword, newPassword } = req.body;
@@ -154,6 +188,11 @@ class UserController implements Controller {
     }
   };
 
+  /**
+   * Handler for deleting user account.
+   * @param req Express request object with user ID.
+   * @param res Express response object.
+   */
   private deleteAccount = async (req: RequestWithUserId, res: Response) => {
     console.log('Delete account request');
     try {
