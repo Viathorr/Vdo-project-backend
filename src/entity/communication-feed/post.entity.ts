@@ -2,6 +2,7 @@ import { Entity, Column, CreateDateColumn, UpdateDateColumn, BaseEntity, Primary
 import { User } from "../user.entity";
 import { Like } from "./like.entity";
 import { Saved } from "./saved.entity";
+import { Comment } from "./comment.entity";
 
 /**
  * Represents user's post entity.
@@ -35,6 +36,12 @@ export class Post extends BaseEntity {
     like => like.post
   )
   likes: Like[]
+  
+  @OneToMany(
+    () => Comment,
+    comment => comment.post
+  )
+  comments: Comment[]
   
   @OneToMany(
     () => Saved,

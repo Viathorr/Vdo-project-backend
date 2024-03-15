@@ -34,7 +34,6 @@ class TodosController implements Controller {
   }
 
   // URL: http://localhost:3500/todos?page=:page&limit=:limit&s=:sort&f=:filter
-  // you can access them by req.query property, e.x. const sortBy = req.query.s;
   private getTodos = async (req: RequestWithUserId, res: Response) => {
     console.log('Get todos request\n');
     const page: number = parseInt(req.query.page as string) || 1;
@@ -57,16 +56,19 @@ class TodosController implements Controller {
 
     this.todosService.setTodosSortingStrategy(sortingStrategy);
 
-    const result: getResult = await this.todosService.getAllTodos(req.id, page, limit);
-    if (!result.todos?.length) {
-      return res.status(204).json({ 'message': 'No todos were found.' });
+    try {
+      const result: getResult = await this.todosService.getAllTodos(req.id, page, limit);
+      if (!result.todos?.length) {
+        return res.status(204).json({ 'message': 'No todos were found.' });
+      }
+      return res.json(result);
+    } catch (err) {
+      return res.sendStatus(404);
     }
-    return res.json(result);
   }
 
   private addTodo = async (req: RequestWithUserId, res: Response) => {
     console.log('Add todo request.\n');
-    console.log('user id:', req.id);
     const { name, deadline } = req.body;
     if (!name) {
       return res.status(400).json({ 'message': 'Todo name is required.' });
