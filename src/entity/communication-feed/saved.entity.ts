@@ -32,7 +32,7 @@ export class Saved extends BaseEntity {
   @JoinColumn({
     name: 'post_id'
   })
-  post: Post[]
+  post: Post;
 
   @CreateDateColumn()
   created_at: Date;
