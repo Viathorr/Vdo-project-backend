@@ -18,6 +18,8 @@ import verifyJWT from './middleware/verifyJWT';
 import refreshTokenController from './controllers/authentication/refreshToken.controller';
 import userController from './controllers/user/user.controller';
 import postsController from './controllers/communication-feed/posts.controller';
+import likesController from './controllers/communication-feed/likes.controller';
+import commentsController from './controllers/communication-feed/comments.controller';
 
 const PORT = process.env.PORT || 3500;
 
@@ -42,6 +44,8 @@ app.use('/', refreshTokenController.router);
 app.use(verifyJWT);
 
 app.use('/', postsController.router);
+app.use('/', likesController.router);
+app.use('/', commentsController.router);
 app.use('/', todosController.router);
 app.use('/', scheduleController.router);
 app.use('/', userController.router);

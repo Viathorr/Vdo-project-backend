@@ -1,6 +1,6 @@
 import AppDataSource from "../../config/mysqlConn";
 import { Like } from "../../entity/communication-feed/like.entity";
-import { Repository } from "typeorm";
+import { DeleteResult, InsertResult, Repository } from "typeorm";
  
 type getResult = {
   numOfLikes: number,
@@ -26,14 +26,31 @@ class LikesService {
       throw err;
     }
   }
+ 
+  public async addlike(postId: number, userId: number) {
+    try {
+      const like: InsertResult = await this.likeRepository.createQueryBuilder('likes').insert().into(Like).values({
+        user: { id: userId },
+        post: { id: postId }
+      }).execute();
+      return like.generatedMaps[0];
+    } catch (err) {
+      throw err;
+    }
+  }
 
-  // public async addlike(...) {
-
-  // }
-
-  // public async deletelike(...) {
-  
-  // }
+  public async deletelike(postId: number) {
+    try {
+      const result: DeleteResult = await this.likeRepository.delete({ post: { id: postId } });
+      if (result.affected === 1) {
+        return { message: 'Success' };
+      } else {
+        return { message: 'Fail' };
+      }
+    } catch (err) {
+      throw err;
+    }
+  }
 }
 
 export default LikesService;

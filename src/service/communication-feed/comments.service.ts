@@ -2,7 +2,7 @@ import AppDataSource from "../../config/mysqlConn";
 import { Comment } from "../../entity/communication-feed/comment.entity";
 // import { CommentDto } from "../../dto/comment.dto";
 import { Repository } from "typeorm";
-
+ 
 class CommentsService {
   private CommentRepository: Repository<Comment> = AppDataSource.getRepository(Comment);
 

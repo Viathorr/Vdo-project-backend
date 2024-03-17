@@ -137,10 +137,10 @@ class TodosService {
       }
       // @ts-ignore
       const result: DeleteResult = await this.todoRepository.delete(todoData.id);
-      if (result.affected == 1) {
-        return { 'status': 'Success' };
+      if (result.affected === 1) {
+        return { message: 'Success' };
       } else {
-        return { 'status': 'Fail' };
+        return { message: 'Fail' };
       }
     } catch (err) {
       console.log(err);

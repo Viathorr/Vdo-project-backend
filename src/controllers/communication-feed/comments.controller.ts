@@ -1,7 +1,7 @@
 import { Response, Router } from 'express';
 import Controller from '../../interfaces/controller.interface';
 import RequestWithUserId from '../../interfaces/requestWithUserId.interface';
-
+ 
 
 class CommentsController implements Controller {
   public path: string = '/comments';
