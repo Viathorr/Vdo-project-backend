@@ -14,7 +14,7 @@ class LikesService {
     try {
       const likes: Like[] = await AppDataSource.getRepository(Like).createQueryBuilder('likes')
         .leftJoinAndSelect('likes.post', 'post')
-        .where('post.id != :postId', { postId })
+        .where('post.id = :postId', { postId })
         .leftJoinAndSelect('likes.user', 'user')
         .getMany();
       const result: getResult = {

@@ -134,6 +134,19 @@ class UserService {
       throw new Error(err instanceof Error ? err.message : 'Unexpected error occurred');
     }
   }
+
+  static async getPostUserInfo(userId: number) {
+    try {
+      const user: User | null = await AppDataSource.getRepository(User).findOneBy({ id: userId });
+      if (user) {
+        return { name: user.name, profileImageURL: user.profile_picture };
+      } else {
+        return {};
+      }
+    } catch (err) {
+      throw err;
+    }
+  }
 }
 
 export default UserService;

@@ -16,11 +16,27 @@ class PostsController implements Controller {
   private initializeRoutes(): void {
     this.router.route(this.path)
       // @ts-ignore
-      .get(this.getPosts);
+      .get(this.getPosts)
+      // @ts-ignore
+      .post(this.addPost);
+    
+    this.router.route(`${this.path}/saved`)
+      // @ts-ignore
+      .get(this.getSavedPosts);    
+    
+    this.router.route(`${this.path}/my`)
+      // @ts-ignore
+      .get(this.getUserPosts);
     
     this.router.route(`${this.path}/:id`)
       // @ts-ignore
-      .get(this.getPost);
+      .get(this.getPost)
+      // @ts-ignore
+      .put(this.updatePost)
+      // @ts-ignore
+      .delete(this.deletePost);
+    
+     
   }
 
   // request sent every time user opens posts feed
@@ -42,6 +58,43 @@ class PostsController implements Controller {
     }
   }
 
+  // request sent every time user opens his posts page
+  // URL: http://localhost:3500/my_posts?page=:page&limit=:limit
+  private getUserPosts = async (req: RequestWithUserId, res: Response) => {
+    console.log('Get user posts request');
+    const page: number = parseInt(req.query.page as string) || 1;
+    const limit: number = parseInt(req.query.limit as string) || 10;
+    try {
+      const result: getPostsResult = await this.postsService.getUsersPosts(req.id, page, limit);
+      if (!result.posts.length) {
+        return res.sendStatus(204);
+      }
+      return res.status(200).json(result);
+    } catch (err) {
+      console.log(err instanceof Error ? err.message : err);
+      return res.sendStatus(404);
+    }
+  }
+  
+  // request sent every time user opens his saved posts page
+  // URL: http://localhost:3500/my_posts/saved?page=:page&limit=:limit
+  private getSavedPosts = async (req: RequestWithUserId, res: Response) => {
+    console.log('Get saved posts request');
+    const page: number = parseInt(req.query.page as string) || 1;
+    const limit: number = parseInt(req.query.limit as string) || 10;
+    try {
+      const result: getPostsResult = await this.postsService.getSavedPosts(req.id, page, limit);
+      if (!result.posts.length) {
+        return res.sendStatus(204);
+      }
+      return res.status(200).json(result);
+    } catch (err) {
+      console.log(err);
+      console.log(err instanceof Error ? err.message : err);
+      return res.sendStatus(500);
+    }
+  }
+
   // request sent every time user clicks on certain post on posts feed page, here I merely have to send all the information about that post, such as user's name, user's image (for sure), date of creation, content, saved/not saved by the user who has sent this request, info about likes (number and liked/not liked by user), all the other information (such as likes, comments + pagination) will be handled by other controllers (likes/comments controllers)
   // URL: http://localhost:3500/posts/:id
   private getPost = async (req: RequestWithUserId, res: Response) => {
@@ -53,6 +106,48 @@ class PostsController implements Controller {
     } catch (err) {
       console.log(err instanceof Error ? err.message : err);
       return res.sendStatus(404);
+    }
+  }
+
+  private addPost = async (req: RequestWithUserId, res: Response) => {
+    const { content } = req.body;
+    if (!content) {
+      return res.status(400).json({ message: 'Content is required.' });
+    }
+    try {
+      const result: string = await this.postsService.addPost(content, req.id);
+      return res.json({ message: result });
+    } catch (err) {
+      console.log(err instanceof Error ? err.message : err);
+      return res.sendStatus(500);
+    }
+  }
+
+  private updatePost = async (req: RequestWithUserId, res: Response) => {
+    const { content } = req.body;
+    const postId: number = parseInt(req.params.id);
+    if (!content) {
+      return res.status(400).json({ message: 'Content is required.' });
+    }
+    try {
+      const result = await this.postsService.updatePost(postId, content, req.id);
+      console.log('Update post result:', result);
+      return res.sendStatus(200);
+    } catch (err) {
+      console.log(err instanceof Error ? err.message : err);
+      return res.status(400).json(err instanceof Error ? err.message : "Fail");
+    }
+  }
+  
+  private deletePost = async (req: RequestWithUserId, res: Response) => {
+    const postId: number = parseInt(req.params.id);
+    try {
+      const result = await this.postsService.deletePost(postId, req.id);
+      console.log('Delete post result:', result.message);
+      return res.json(result);
+    } catch (err) {
+      console.log(err instanceof Error ? err.message : err);
+      return res.status(400).json(err instanceof Error ? err.message : "Fail");
     }
   }
 }

@@ -2,8 +2,8 @@
 import AppDataSource from "../../config/mysqlConn";
 import { Post } from "../../entity/communication-feed/post.entity";
 import { Saved } from "../../entity/communication-feed/saved.entity";
-import { User } from "../../entity/user.entity";
-import { DeleteResult, InsertResult, Repository } from "typeorm";
+import UserService from "../../service/user.service";
+import { DeleteResult, Repository } from "typeorm";
 import LikesService from "./likes.service";
 import CommentsService from "./comments.service";
 
@@ -78,8 +78,9 @@ class PostsService {
       const offset: number = (pageNum - 1) * limit;
       const savedPosts: Saved[] = await this.savedPostsRepository.createQueryBuilder('saved_posts')
             .leftJoinAndSelect('saved_posts.user', 'user')
+            .leftJoinAndSelect('saved_posts.post', 'corr_post')
+            .leftJoinAndSelect('corr_post.user', 'post_user') // Add this line to join the user associated with the post
             .where('user.id = :userId', { userId }) 
-            .innerJoinAndSelect('saved_posts.post', 'post')
             .orderBy('saved_posts.created_at', 'DESC')
             .skip(offset)
             .take(limit + 1)
@@ -153,10 +154,12 @@ class PostsService {
         throw new Error(`No post matches ID ${postId}`);
       } else {
         let result: getPostResult = { id: post.id, content: post.content, created_at: post.created_at, updated_at: post.updated_at };
+
         const likes = await LikesService.getNumOfLikes(postId, userId);
-        result = { ...result, numOfLikes: likes.numOfLikes, liked: likes.likedByUser };
-        const userInfo = await this.getPostUserInfo(post.user.id);
-        result = { ...result, username: userInfo.name, userProfileImageURL: userInfo.profileImageURL };
+        const userInfo = await UserService.getPostUserInfo(post.user.id);
+
+        result = { ...result, numOfLikes: likes.numOfLikes, liked: likes.likedByUser, username: userInfo.name, userProfileImageURL: userInfo.profileImageURL };
+        
         const saved: Saved | null = await this.savedPostsRepository.findOne({
           where: { user: { id: userId }, post: { id: postId } },
         });
@@ -214,9 +217,9 @@ class PostsService {
       } else {
         const result: DeleteResult = await this.postRepository.delete(postId);
         if (result.affected == 1) {
-          return { 'status': 'Success' };
+          return { message: 'Success' };
         } else {
-          return { 'status': 'Fail' };
+          return { message: 'Fail' };
         }
       }
     } catch (err) {
@@ -233,28 +236,14 @@ class PostsService {
     }
   }
 
-  private async getPostUserInfo(userId: number) {
-    try {
-      const user: User | null = await AppDataSource.getRepository(User).findOneBy({ id: userId });
-      if (user) {
-        return { name: user.name, profileImageURL: user.profile_picture };
-      } else {
-        return {};
-      }
-    } catch (err) {
-      throw err;
-    }
-  }
-
   private async getAllNeededPostsInformation(posts: Post[] | Saved[]) {
-    const postUserInfoPromises = posts.map(post => this.getPostUserInfo(post.user.id));
-    const likesNumPromises = posts.map(post => LikesService.getNumOfLikes(post.id));
-    const commentsNumPromises= posts.map(post => CommentsService.getNumOfComments(post.id));
+    const postUserInfoPromises = posts.map(post => UserService.getPostUserInfo(post instanceof Post ? post.user.id : post.post.user.id));
+    const likesNumPromises = posts.map(post => LikesService.getNumOfLikes(post instanceof Post ? post.id : post.post.id));
+    const commentsNumPromises= posts.map(post => CommentsService.getNumOfComments(post instanceof Post ? post.id : post.post.id));
 
     const postUserInfos = await Promise.all(postUserInfoPromises);
     const likesNums = await Promise.all(likesNumPromises);
     const commentsNums = await Promise.all(commentsNumPromises);
-
     return { postUserInfos, likesNums, commentsNums };
   } 
 
