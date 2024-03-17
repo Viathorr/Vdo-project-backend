@@ -6,6 +6,7 @@ import UserService from "../../service/user.service";
 import { DeleteResult, Repository } from "typeorm";
 import LikesService from "./likes.service";
 import CommentsService from "./comments.service";
+import { paginationInfo } from "../paginationInfo.utility";
 
 type postInfo = {
   content: string,
@@ -53,10 +54,11 @@ class PostsService {
       };
 
       if (posts.length) {
-        this.paginationInfo(result, posts, pageNum, limit, offset);
+        paginationInfo(result, posts, pageNum, limit, offset);
       
         const { postUserInfos, likesNums, commentsNums } = await this.getAllNeededPostsInformation(posts);
 
+        // think of getting rid of userinfo checking, because we already have that in our posts (because of left join)
         // @ts-ignore
         result.posts = posts.map((post, index) => ({
           content: post.content,
@@ -91,7 +93,7 @@ class PostsService {
       };
 
       if (savedPosts.length) {
-        this.paginationInfo(result, savedPosts, pageNum, limit, offset);
+        paginationInfo(result, savedPosts, pageNum, limit, offset);
     
         const { postUserInfos, likesNums, commentsNums } = await this.getAllNeededPostsInformation(savedPosts);
 
@@ -126,7 +128,7 @@ class PostsService {
       };
 
       if (userPosts.length) {
-        this.paginationInfo(result, userPosts, pageNum, limit, offset);
+        paginationInfo(result, userPosts, pageNum, limit, offset);
     
         const { likesNums, commentsNums } = await this.getAllNeededPostsInformation(userPosts);
 
@@ -246,16 +248,6 @@ class PostsService {
     const commentsNums = await Promise.all(commentsNumPromises);
     return { postUserInfos, likesNums, commentsNums };
   } 
-
-  private paginationInfo(result: getPostsResult, posts: Post[] | Saved[], pageNum: number, limit: number, offset: number): void {
-    if (posts.length > limit) {
-      result.nextPage = pageNum + 1;
-      posts.pop();
-    }
-    if (offset > 0) {
-      result.prevPage = pageNum - 1;
-    }
-  }
 }
 
 export default PostsService;
