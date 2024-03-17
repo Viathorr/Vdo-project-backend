@@ -38,7 +38,8 @@ class CommentsController implements Controller {
     }
     try {
       const result = await this.likesService.addlike(postId, req.id);
-      return res.json(result);
+      console.log('Inserted like:', result);
+      return res.json({ message: 'Success' });
     } catch (err) {
       console.log(err instanceof Error ? err.message : err);
       return res.sendStatus(400);
