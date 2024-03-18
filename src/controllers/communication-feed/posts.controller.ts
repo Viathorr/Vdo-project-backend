@@ -2,12 +2,13 @@ import { Response, Router } from 'express';
 import PostsService, { getPostResult, getPostsResult } from '../../service/communication-feed/posts.service';
 import Controller from '../../interfaces/controller.interface';
 import RequestWithUserId from '../../interfaces/requestWithUserId.interface';
-
+import { PostDtoBuilder } from '../../dto/post.dto';
 
 class PostsController implements Controller {
   public path: string = '/posts';
   public router: Router = Router();
   private postsService: PostsService = new PostsService();
+  private postDtoBuilder: PostDtoBuilder = new PostDtoBuilder();
 
   constructor() {
     this.initializeRoutes();
@@ -46,8 +47,9 @@ class PostsController implements Controller {
     console.log('Get all posts request');
     const page: number = parseInt(req.query.page as string) || 1;
     const limit: number = parseInt(req.query.limit as string) || 10;
+    const userId: number = req.id;
     try {
-      const result: getPostsResult = await this.postsService.getAllPosts(req.id, page, limit);
+      const result: getPostsResult = await this.postsService.getAllPosts(userId, page, limit);
       if (!result.posts.length) {
         return res.sendStatus(204);
       }
@@ -64,8 +66,9 @@ class PostsController implements Controller {
     console.log('Get user posts request');
     const page: number = parseInt(req.query.page as string) || 1;
     const limit: number = parseInt(req.query.limit as string) || 10;
+    const userId: number = req.id;
     try {
-      const result: getPostsResult = await this.postsService.getUsersPosts(req.id, page, limit);
+      const result: getPostsResult = await this.postsService.getUsersPosts(userId, page, limit);
       if (!result.posts.length) {
         return res.sendStatus(204);
       }
@@ -82,8 +85,9 @@ class PostsController implements Controller {
     console.log('Get saved posts request');
     const page: number = parseInt(req.query.page as string) || 1;
     const limit: number = parseInt(req.query.limit as string) || 10;
+    const userId: number = req.id;
     try {
-      const result: getPostsResult = await this.postsService.getSavedPosts(req.id, page, limit);
+      const result: getPostsResult = await this.postsService.getSavedPosts(userId, page, limit);
       if (!result.posts.length) {
         return res.sendStatus(204);
       }
@@ -99,9 +103,8 @@ class PostsController implements Controller {
   // URL: http://localhost:3500/posts/:id
   private getPost = async (req: RequestWithUserId, res: Response) => {
     console.log('Get certain post request');
-    const postId: number = parseInt(req.params.id);
     try {
-      const result: getPostResult = await this.postsService.getPost(postId, req.id);
+      const result: getPostResult = await this.postsService.getPost(this.postDtoBuilder.addId(parseInt(req.params.id)).addUserId(req.id).build());
       return res.status(200).json(result);
     } catch (err) {
       console.log(err instanceof Error ? err.message : err);
@@ -110,12 +113,13 @@ class PostsController implements Controller {
   }
 
   private addPost = async (req: RequestWithUserId, res: Response) => {
+    console.log('Add post request');
     const { content } = req.body;
     if (!content) {
       return res.status(400).json({ message: 'Content is required.' });
     }
     try {
-      const result: string = await this.postsService.addPost(content, req.id);
+      const result: string = await this.postsService.addPost(this.postDtoBuilder.addContent(content).addUserId(req.id).build());
       return res.json({ message: result });
     } catch (err) {
       console.log(err instanceof Error ? err.message : err);
@@ -124,13 +128,13 @@ class PostsController implements Controller {
   }
 
   private updatePost = async (req: RequestWithUserId, res: Response) => {
+    console.log('Update post request');
     const { content } = req.body;
-    const postId: number = parseInt(req.params.id);
     if (!content) {
       return res.status(400).json({ message: 'Content is required.' });
     }
     try {
-      const result = await this.postsService.updatePost(postId, content, req.id);
+      const result = await this.postsService.updatePost(this.postDtoBuilder.addId(parseInt(req.params.id)).addUserId(req.id).addContent(content).build());
       console.log('Update post result:', result);
       return res.sendStatus(200);
     } catch (err) {
@@ -140,9 +144,9 @@ class PostsController implements Controller {
   }
   
   private deletePost = async (req: RequestWithUserId, res: Response) => {
-    const postId: number = parseInt(req.params.id);
+    console.log('Delete post request');
     try {
-      const result = await this.postsService.deletePost(postId, req.id);
+      const result = await this.postsService.deletePost(this.postDtoBuilder.addId(parseInt(req.params.id)).addUserId(req.id).build());
       console.log('Delete post result:', result.message);
       return res.json(result);
     } catch (err) {

@@ -7,6 +7,7 @@ import { DeleteResult, Repository } from "typeorm";
 import LikesService from "./likes.service";
 import CommentsService from "./comments.service";
 import { paginationInfo } from "../paginationInfo.utility";
+import { PostDto } from "../../dto/post.dto";
 
 type postInfo = {
   content: string,
@@ -146,24 +147,24 @@ class PostsService {
     }
   }
 
-  public async getPost(postId: number, userId: number) {
+  public async getPost(postData: PostDto) {
     try {
       const post: Post | null = await this.postRepository.findOne({
-        where: { id: postId },
+        where: { id: postData.id },
         relations: ['user'] 
       });
       if (!post) {
-        throw new Error(`No post matches ID ${postId}`);
+        throw new Error(`No post matches ID ${postData.id}`);
       } else {
         let result: getPostResult = { id: post.id, content: post.content, created_at: post.created_at, updated_at: post.updated_at };
 
-        const likes = await LikesService.getNumOfLikes(postId, userId);
+        const likes = await LikesService.getNumOfLikes(postData.id as number, postData.userId);
         const userInfo = await UserService.getPostUserInfo(post.user.id);
 
         result = { ...result, numOfLikes: likes.numOfLikes, liked: likes.likedByUser, username: userInfo.name, userProfileImageURL: userInfo.profileImageURL };
         
         const saved: Saved | null = await this.savedPostsRepository.findOne({
-          where: { user: { id: userId }, post: { id: postId } },
+          where: { user: { id: postData.userId }, post: { id: postData.id } },
         });
         if (saved) {
           result.saved = true;
@@ -177,11 +178,11 @@ class PostsService {
     }
   }
 
-  public async addPost(content: string, userId: number) {
+  public async addPost(postData: PostDto) {
     try {
       await this.postRepository.createQueryBuilder('posts').insert().into(Post).values({
-        content,
-        user: { id: userId }
+        content: postData.content,
+        user: { id: postData.id }
       }).execute();
       return 'Success';
     } catch (err) {
@@ -189,17 +190,17 @@ class PostsService {
     }
   }
 
-  public async updatePost(postId: number, content: string, userId: number) {
+  public async updatePost(postData: PostDto) {
     try {
       const post: Post | null = await this.postRepository.findOne({
         where: {
-          id: postId,
-          user: { id: userId }
+          id: postData.id,
+          user: { id: postData.userId }
       }});
       if (!post) {
-        throw new Error(`No Post matches ID ${postId}.`);
+        throw new Error(`No Post matches ID ${postData.id}.`);
       } else {
-        this.postRepository.merge(post, { content });
+        this.postRepository.merge(post, { content: postData.content });
         return await this.postRepository.save(post);
       }
     } catch (err) {
@@ -207,17 +208,17 @@ class PostsService {
     }
   }
 
-  public async deletePost(postId: number, userId: number) {
+  public async deletePost(postData: PostDto) {
     try {
       const post: Post | null = await this.postRepository.findOne({
         where: {
-          id: postId,
-          user: { id: userId }
+          id: postData.id,
+          user: { id: postData.userId }
       }});
       if (!post) {
-        throw new Error(`No Post matches ID ${postId}.`);
+        throw new Error(`No Post matches ID ${postData.id}.`);
       } else {
-        const result: DeleteResult = await this.postRepository.delete(postId);
+        const result: DeleteResult = await this.postRepository.delete(postData.id as number);
         if (result.affected == 1) {
           return { message: 'Success' };
         } else {
