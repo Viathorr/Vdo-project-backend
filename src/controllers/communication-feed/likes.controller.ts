@@ -4,7 +4,10 @@ import RequestWithUserId from '../../interfaces/requestWithUserId.interface';
 import LikesService from '../../service/communication-feed/likes.service';
 
 
-class CommentsController implements Controller {
+/**
+ * Controller handling routes related to likes on posts.
+ */
+class LikesController implements Controller {
   public path: string = '/likes';
   public router: Router = Router();
   private likesService: LikesService = new LikesService();
@@ -27,9 +30,15 @@ class CommentsController implements Controller {
   // private getLikes = async (req: RequestWithUserId, res: Response) => {
 
   // }
-  
+   
   // adds new record to the Like table in db
   // URL: http://localhost:3500/comments?post_id=:id
+  /**
+   * Handles POST request to add a like to a post.
+   * @param req Request object containing query parameter: post_id.
+   * @param res Response object to send back the result.
+   */
+
   private addLike = async (req: RequestWithUserId, res: Response) => {
     console.log('Add like request');
     const postId = parseInt(req.query.post_id as string);
@@ -48,6 +57,11 @@ class CommentsController implements Controller {
   
   // deletes the record from the Like table in db with certain user's id
   // URL: http://localhost:3500/comments?post_id=:id
+  /**
+   * Handles DELETE request to delete a like from a post.
+   * @param req Request object containing query parameter: post_id.
+   * @param res Response object to send back the result.
+   */
   private deleteLike = async (req: RequestWithUserId, res: Response) => {
     console.log('Delete like request');
     const postId = parseInt(req.query.post_id as string);
@@ -64,4 +78,4 @@ class CommentsController implements Controller {
   }
 }
 
-export default new CommentsController();
+export default new LikesController();

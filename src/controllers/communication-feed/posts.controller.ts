@@ -4,6 +4,9 @@ import Controller from '../../interfaces/controller.interface';
 import RequestWithUserId from '../../interfaces/requestWithUserId.interface';
 import { PostDtoBuilder } from '../../dto/post.dto';
 
+/**
+ * Controller handling routes related to posts.
+ */
 class PostsController implements Controller {
   public path: string = '/posts';
   public router: Router = Router();
@@ -43,6 +46,11 @@ class PostsController implements Controller {
   // request sent every time user opens posts feed
   // here I merely have to send some basic information about the post (user's name, user's image(maybe), content(with limitations handled on the frontend side), amount of likes and comments (separately from comments and likes services), date of creation)
   // URL: http://localhost:3500/posts?page=:page&limit=:limit
+  /**
+   * Handles GET request to fetch all posts.
+   * @param req Request object containing query parameters: page and limit.
+   * @param res Response object to send back the result.
+   */
   private getPosts = async (req: RequestWithUserId, res: Response) => {
     console.log('Get all posts request');
     const page: number = parseInt(req.query.page as string) || 1;
@@ -62,6 +70,11 @@ class PostsController implements Controller {
 
   // request sent every time user opens his posts page
   // URL: http://localhost:3500/my_posts?page=:page&limit=:limit
+  /**
+   * Handles GET request to fetch posts created by the user.
+   * @param req Request object containing query parameters: page and limit.
+   * @param res Response object to send back the result.
+   */
   private getUserPosts = async (req: RequestWithUserId, res: Response) => {
     console.log('Get user posts request');
     const page: number = parseInt(req.query.page as string) || 1;
@@ -78,9 +91,14 @@ class PostsController implements Controller {
       return res.sendStatus(404);
     }
   }
-  
+   
   // request sent every time user opens his saved posts page
   // URL: http://localhost:3500/my_posts/saved?page=:page&limit=:limit
+  /**
+   * Handles GET request to fetch saved posts by the user.
+   * @param req Request object containing query parameters: page and limit.
+   * @param res Response object to send back the result.
+   */
   private getSavedPosts = async (req: RequestWithUserId, res: Response) => {
     console.log('Get saved posts request');
     const page: number = parseInt(req.query.page as string) || 1;
@@ -101,6 +119,11 @@ class PostsController implements Controller {
 
   // request sent every time user clicks on certain post on posts feed page, here I merely have to send all the information about that post, such as user's name, user's image (for sure), date of creation, content, saved/not saved by the user who has sent this request, info about likes (number and liked/not liked by user), all the other information (such as likes, comments + pagination) will be handled by other controllers (likes/comments controllers)
   // URL: http://localhost:3500/posts/:id
+  /**
+   * Handles GET request to fetch a specific post.
+   * @param req Request object containing the post ID in the URL.
+   * @param res Response object to send back the result.
+   */
   private getPost = async (req: RequestWithUserId, res: Response) => {
     console.log('Get certain post request');
     try {
@@ -112,6 +135,11 @@ class PostsController implements Controller {
     }
   }
 
+  /**
+   * Handles POST request to add a new post.
+   * @param req Request object containing the post content in the body.
+   * @param res Response object to send back the result.
+   */
   private addPost = async (req: RequestWithUserId, res: Response) => {
     console.log('Add post request');
     const { content } = req.body;
@@ -127,6 +155,11 @@ class PostsController implements Controller {
     }
   }
 
+  /**
+   * Handles PUT request to update a post.
+   * @param req Request object containing the post ID in the URL and updated content in the body.
+   * @param res Response object to send back the result.
+   */
   private updatePost = async (req: RequestWithUserId, res: Response) => {
     console.log('Update post request');
     const { content } = req.body;
@@ -143,6 +176,11 @@ class PostsController implements Controller {
     }
   }
   
+  /**
+   * Handles DELETE request to delete a post.
+   * @param req Request object containing the post ID in the URL.
+   * @param res Response object to send back the result.
+   */
   private deletePost = async (req: RequestWithUserId, res: Response) => {
     console.log('Delete post request');
     try {

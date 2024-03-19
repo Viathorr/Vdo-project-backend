@@ -35,10 +35,21 @@ export type getPostResult = {
   saved?: boolean
 };
  
+/**
+ * Service class for managing post operations.
+ */
 class PostsService {
   private postRepository: Repository<Post> = AppDataSource.getRepository(Post);
   private savedPostsRepository: Repository<Saved> = AppDataSource.getRepository(Saved);
 
+  /**
+   * Get all posts except those belonging to the current user.
+   * @param userId ID of the current user.
+   * @param pageNum Page number for pagination.
+   * @param limit Number of posts per page.
+   * @returns Promise with getPostsResult containing posts' information.
+   * @throws Error if some error occurred during the database query processing.
+   */
   public async getAllPosts(userId: number, pageNum: number, limit: number): Promise<getPostsResult> {
     try {
       const offset: number = (pageNum - 1) * limit;
@@ -76,7 +87,15 @@ class PostsService {
   }
 
   // user cannot save his own posts so you don't have to check whether IDs are the same or not
-  public async getSavedPosts(userId: number, pageNum: number, limit: number) {
+  /**
+   * Get posts saved by the current user.
+   * @param userId ID of the current user.
+   * @param pageNum Page number for pagination.
+   * @param limit Number of posts per page.
+   * @returns Promise with getPostsResult containing posts' information.
+   * @throws Error if some error occurred during the database query processing.
+   */
+  public async getSavedPosts(userId: number, pageNum: number, limit: number): Promise<getPostsResult> {
       try {
       const offset: number = (pageNum - 1) * limit;
       const savedPosts: Saved[] = await this.savedPostsRepository.createQueryBuilder('saved_posts')
@@ -113,7 +132,15 @@ class PostsService {
     }
   }
 
-  public async getUsersPosts(userId: number, pageNum: number, limit: number) {
+  /**
+   * Get all posts that belongs to the current user.
+   * @param userId ID of the current user.
+   * @param pageNum Page number for pagination.
+   * @param limit Number of posts per page.
+   * @returns Promise with getPostssResult containing posts' information.
+   * @throws Error if some error occurred during the database query processing.
+   */
+  public async getUsersPosts(userId: number, pageNum: number, limit: number): Promise<getPostsResult> {
     try {
       const offset: number = (pageNum - 1) * limit;
       const userPosts: Post[] = await this.postRepository.createQueryBuilder('posts')
@@ -146,7 +173,13 @@ class PostsService {
       throw err;
     }
   }
-
+ 
+   /**
+   * Retrieves detailed information about a specific post.
+   * @param postData - The PostDto object containing post ID and user ID.
+   * @returns A promise that resolves to a getPostResult object.
+   * @throws Error if some error occurred during the database query processing.
+   */
   public async getPost(postData: PostDto) {
     try {
       const post: Post | null = await this.postRepository.findOne({
@@ -178,7 +211,13 @@ class PostsService {
     }
   }
 
-  public async addPost(postData: PostDto) {
+  /**
+   * Adds a new post to the database.
+   * @param postData - The PostDto object containing post content and user ID.
+   * @returns A promise that resolves to a success message upon successful insertion.
+   * @throws Error if some error occurred during the database query processing.
+   */
+  public async addPost(postData: PostDto): Promise<string> {
     try {
       await this.postRepository.createQueryBuilder('posts').insert().into(Post).values({
         content: postData.content,
@@ -190,6 +229,12 @@ class PostsService {
     }
   }
 
+  /**
+   * Updates an existing post in the database.
+   * @param postData - The PostDto object containing post ID, user ID, and updated content.
+   * @returns A promise that resolves to the updated post object.
+   * @throws Error if some error occurred during the database query processing.
+   */
   public async updatePost(postData: PostDto) {
     try {
       const post: Post | null = await this.postRepository.findOne({
@@ -208,6 +253,12 @@ class PostsService {
     }
   }
 
+  /**
+   * Deletes a post from the database.
+   * @param postData - The PostDto object containing post ID and user ID.
+   * @returns A promise that resolves to a success message upon successful deletion.
+   * @throws Error if some error occurred during the database query processing.
+   */
   public async deletePost(postData: PostDto) {
     try {
       const post: Post | null = await this.postRepository.findOne({
@@ -231,6 +282,12 @@ class PostsService {
   }
 
   // To get an information about how many questions user has asked (when user fetches his own info for profile page)
+  /**
+   * Retrieves the number of posts made by a specific user.
+   * @param userId - The ID of the user.
+   * @returns A promise that resolves to the number of posts.
+   * @throws Error if some error occurred during the database query processing.
+   */
   static async amountOfPostsForUser(userId: number) {
     try {
       return await AppDataSource.getRepository(Post).count({ where: { user: { id: userId } } });
@@ -239,6 +296,12 @@ class PostsService {
     }
   }
 
+  /**
+   * Retrieves additional information needed for posts, such as user info, likes, and comments.
+   * @param posts - An array of Post or Saved objects.
+   * @returns A promise that resolves to an object containing postUserInfos, likesNums, and commentsNums.
+   * @throws Error if some error occurred during the database query processing.
+   */
   private async getAllNeededPostsInformation(posts: Post[] | Saved[]) {
     const postUserInfoPromises = posts.map(post => UserService.getPostUserInfo(post instanceof Post ? post.user.id : post.post.user.id));
     const likesNumPromises = posts.map(post => LikesService.getNumOfLikes(post instanceof Post ? post.id : post.post.id));

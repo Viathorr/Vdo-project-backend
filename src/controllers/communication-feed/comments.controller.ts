@@ -3,7 +3,9 @@ import Controller from '../../interfaces/controller.interface';
 import RequestWithUserId from '../../interfaces/requestWithUserId.interface';
 import CommentsService, { getCommentsResult } from '../../service/communication-feed/comments.service';
  
-
+/**
+ * Controller handling routes related to comments on posts.
+ */
 class CommentsController implements Controller {
   public path: string = '/comments';
   public router: Router = Router();
@@ -12,7 +14,7 @@ class CommentsController implements Controller {
   constructor() {
     this.initializeRoutes();
   }
-
+ 
   private initializeRoutes(): void {
     this.router.route(this.path)
       // @ts-ignore
@@ -21,12 +23,17 @@ class CommentsController implements Controller {
       .post(this.addComment)
       // @ts-ignore
       .delete(this.deleteComment);
-  }
+  } 
 
   // getComments request is sent every time user clicks on certain post and is redirected to the page with that post's information
   // also I have to add the property called yours/not yours (or sth else) to inform user that he is the author of that comment
   // the comments' info I have to send: user's name, user's image(maybe, not sure), content, creation date
   // URL: http://localhost:3500/comments?post_id=:id&page=:page&limit=:limit
+  /**
+   * Handles GET request to retrieve comments for a specific post.
+   * @param req Request object containing query parameters: post_id, page, limit.
+   * @param res Response object to send back the result.
+   */
   private getComments = async (req: RequestWithUserId, res: Response) => {
     console.log('Get comments request');
     const postId: number = parseInt(req.query.post_id as string);
@@ -48,6 +55,11 @@ class CommentsController implements Controller {
   }
   
   // URL: http://localhost:3500/comments?post_id=:id
+  /**
+   * Handles POST request to add a new comment to a post.
+   * @param req Request object containing query parameters: post_id and comment content in the body.
+   * @param res Response object to send back the result.
+   */
   private addComment = async (req: RequestWithUserId, res: Response) => {
     console.log('Add comment request');
     const postId: number = parseInt(req.query.post_id as string);
@@ -66,6 +78,11 @@ class CommentsController implements Controller {
   }
   
   // URL: http://localhost:3500/comments?post_id=:id&comment_id=:id
+  /**
+   * Handles DELETE request to delete a comment from a post.
+   * @param req Request object containing query parameters: post_id and comment_id.
+   * @param res Response object to send back the result.
+   */
   private deleteComment = async (req: RequestWithUserId, res: Response) => {
     console.log('Delete comment request');
     const postId: number = parseInt(req.query.post_id as string);
