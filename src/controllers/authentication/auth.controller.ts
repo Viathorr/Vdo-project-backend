@@ -9,7 +9,7 @@ import { UserDtoBuilder } from "../../dto/user.dto";
 class AuthController implements Controller {
   public path: string = '/auth';
   public router: Router = Router();
-  private authenticationService: AuthenticationService = new AuthenticationService();
+  public authenticationService: AuthenticationService = new AuthenticationService();
   private userDtoBuilder: UserDtoBuilder = new UserDtoBuilder();
 
   /**
@@ -34,13 +34,11 @@ class AuthController implements Controller {
    * @param res Response object for sending access token or appropriate status codes.
    * @returns Resolves with access and refresh tokens or sends appropriate status codes.
    */
-  private authenticate = async (req: Request, res: Response) => {
-    console.log('Authenticate request');
-    console.log('cookies:', req.cookies?.refreshToken);
+  public authenticate = async (req: Request, res: Response) => {
+    console.log('Authentication request');
     const { email, password } = req.body;
-    console.log(req.body);
     if (!email || !password) {
-      return res.status(400).json({ 'message': 'Email and password are required.' });
+      return res.status(400).json({ message: 'Email and password are required.' });
     }
     
     try {
