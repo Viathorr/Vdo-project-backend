@@ -33,7 +33,7 @@ describe('authentication', () => {
     const mockReq = httpMocks.createRequest<Request>();
     const mockRes = httpMocks.createResponse<Response>();
 
-    await authController.authenticate(mockReq as Request, mockRes as Response);
+    await authController.authenticate(mockReq, mockRes);
 
     expect(mockRes.statusCode).toBe(400);
     expect(mockRes._isEndCalled()).toBeTruthy();
