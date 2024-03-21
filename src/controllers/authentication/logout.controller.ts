@@ -1,11 +1,11 @@
-import { Router, Request, Response } from "express";
+import e, { Router, Request, Response } from "express";
 import Controller from "../../interfaces/controller.interface";
 import AuthenticationService from "../../service/authentication.service";
 
 class LogoutController implements Controller {
   public path: string = '/logout';
   public router: Router = Router();
-  private authenticationService: AuthenticationService = new AuthenticationService();
+  public authenticationService: AuthenticationService = new AuthenticationService();
 
   /**
    * Creates an instance of LogoutController.
@@ -29,7 +29,7 @@ class LogoutController implements Controller {
    * @param res Response object for clearing cookies and sending appropriate status codes.
    * @returns Resolves with status code 204 (No Content) or clears cookies and sends status code 204.
    */
-  private logout = async (req: Request, res: Response) => {
+  public logout = async (req: Request, res: Response) => {
     console.log("In logout request");
     const refreshToken = req.cookies?.refreshToken;
     if (!refreshToken) {
@@ -37,11 +37,11 @@ class LogoutController implements Controller {
       return res.sendStatus(204); // No content
     }
     try {
-      this.authenticationService.logout(refreshToken);
+      await this.authenticationService.logout(refreshToken);
       res.clearCookie('refreshToken', { httpOnly: true, sameSite: 'none', secure: true, maxAge: 24 * 60 * 60 * 1000 });
       return res.sendStatus(204);
     } catch (err) {
-      console.log(err);
+      console.log(err instanceof Error ? err.message : err);
       res.clearCookie('refreshToken', { httpOnly: true });
       return res.sendStatus(204);
     }

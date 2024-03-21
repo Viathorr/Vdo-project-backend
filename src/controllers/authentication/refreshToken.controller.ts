@@ -8,7 +8,7 @@ import AuthenticationService from "../../service/authentication.service";
 class RefreshTokenController implements Controller {
   public path: string = '/refresh';
   public router: Router = Router();
-  private authenticationService: AuthenticationService = new AuthenticationService();
+  public authenticationService: AuthenticationService = new AuthenticationService();
 
   /**
    * Creates an instance of RefreshTokenController.
@@ -32,7 +32,7 @@ class RefreshTokenController implements Controller {
    * @param res Response object for sending access token or appropriate status codes.
    * @returns Resolves with access and refresh tokens or sends appropriate status codes.
    */
-  private refreshToken = async (req: Request, res: Response) => {
+  public refreshToken = async (req: Request, res: Response) => {
     console.log('Refresh token request', Date().toString());
 
     if (!req.cookies?.refreshToken) {
@@ -48,9 +48,7 @@ class RefreshTokenController implements Controller {
 
       return res.json({ accessToken });
     } catch (err) {
-      if (err instanceof Error) {
-        console.log(err.message);
-      }
+      console.log(err instanceof Error ? err.message : err);
       return res.sendStatus(403);
     }
   }

@@ -9,7 +9,7 @@ import AuthenticationService from "../../service/authentication.service";
 class RegisterController implements Controller {
   public path: string = '/register';
   public router: Router = Router();
-  private authenticationService: AuthenticationService = new AuthenticationService();
+  public authenticationService: AuthenticationService = new AuthenticationService();
   private userDtoBuilder: UserDtoBuilder = new UserDtoBuilder();
 
   /**
@@ -34,13 +34,12 @@ class RegisterController implements Controller {
    * @param res Response object for sending access token or appropriate status codes.
    * @returns Resolves with access and refresh tokens or sends appropriate status codes.
    */
-  private register = async (req: Request, res: Response) => {
+  public register = async (req: Request, res: Response) => {
     console.log('registration request');
     const { name, email, password } = req.body;
-    console.log(name, email, password);
     
     if (!name || !email || !password) {
-      return res.status(400).json({ 'message': 'Username and password are required.' });
+      return res.status(400).json({ message: 'Username, email and password are required.' });
     }
    
     try {
@@ -52,8 +51,8 @@ class RegisterController implements Controller {
       
       return res.status(201).json({ accessToken });
     } catch (err) {
-      console.log(err);
-      return res.status(500).json({ message: err });
+      console.log(err instanceof Error ? err.message : err);
+      return res.status(500).json({ message: err instanceof Error ? err.message : 'Some error occurred.' });
     }
   }
 }
