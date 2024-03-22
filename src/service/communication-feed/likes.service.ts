@@ -59,12 +59,16 @@ class LikesService {
   /**
    * Delete a like from a post.
    * @param postId ID of the post to delete the like from.
+   * @param userId ID of the user whose like to delete.
    * @returns Promise with the result of the like deletion.
    * @throws Error if some error occurred during the database query processing.
    */
-  public async deletelike(postId: number) {
+  public async deletelike(postId: number, userId: number) {
     try {
-      const result: DeleteResult = await this.likeRepository.delete({ post: { id: postId } });
+      const result: DeleteResult = await this.likeRepository.delete({
+        post: { id: postId },
+        user: { id: userId }
+      });
       if (result.affected === 1) {
         return { message: 'Success' };
       } else {

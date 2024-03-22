@@ -10,7 +10,7 @@ import LikesService from '../../service/communication-feed/likes.service';
 class LikesController implements Controller {
   public path: string = '/likes';
   public router: Router = Router();
-  private likesService: LikesService = new LikesService();
+  public likesService: LikesService = new LikesService();
 
   constructor() {
     this.initializeRoutes();
@@ -39,7 +39,7 @@ class LikesController implements Controller {
    * @param res Response object to send back the result.
    */
 
-  private addLike = async (req: RequestWithUserId, res: Response) => {
+  public addLike = async (req: RequestWithUserId, res: Response) => {
     console.log('Add like request');
     const postId = parseInt(req.query.post_id as string);
     if (!postId) {
@@ -62,14 +62,14 @@ class LikesController implements Controller {
    * @param req Request object containing query parameter: post_id.
    * @param res Response object to send back the result.
    */
-  private deleteLike = async (req: RequestWithUserId, res: Response) => {
+  public deleteLike = async (req: RequestWithUserId, res: Response) => {
     console.log('Delete like request');
     const postId = parseInt(req.query.post_id as string);
     if (!postId) {
       return res.sendStatus(404);
     }
     try {
-      const result = await this.likesService.deletelike(postId);
+      const result = await this.likesService.deletelike(postId, req.id);
       return res.json(result);
     } catch (err) {
       console.log(err instanceof Error ? err.message : err);

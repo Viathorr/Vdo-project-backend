@@ -2,7 +2,6 @@ import todosController from "./todos.controller";
 import httpMocks from 'node-mocks-http';
 import { Response } from "express";
 import RequestWithUserId from "../../interfaces/requestWithUserId.interface";
-import { TodoDto } from "../../dto/todo.dto";
 import { Todo } from "../../entity/todo.entity";
 
 describe('get all todos', () => {

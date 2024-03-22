@@ -2,6 +2,7 @@ import Day from "../../model/Schedule";
 import { Router } from "express";
 import { Request, Response } from "express";
 
+// not going to create unittests because this controller will change
 class ScheduleController {
   path: string = '/schedule';
   router: Router = Router();
