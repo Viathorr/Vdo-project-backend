@@ -17,7 +17,7 @@ import { TodosActiveFilter, TodosCompletedFilter } from "../../service/todos/tod
 class TodosController implements Controller {
   public path: string = '/todos';
   public router: Router = Router();
-  private todosService: TodosService = new TodosService();
+  public todosService: TodosService = new TodosService();
   private todoDtoBuilder: TodoDtoBuilder = new TodoDtoBuilder();
   
   /**
@@ -50,7 +50,7 @@ class TodosController implements Controller {
    * @returns Resolves with todos data or sends appropriate status codes.
    */
   // URL: http://localhost:3500/todos?page=:page&limit=:limit&s=:sort&f=:filter
-  private getTodos = async (req: RequestWithUserId, res: Response) => {
+  public getTodos = async (req: RequestWithUserId, res: Response) => {
     console.log('Get todos request\n');
     const page: number = parseInt(req.query.page as string) || 1;
     const limit: number = parseInt(req.query.limit as string) || 6;
@@ -75,10 +75,11 @@ class TodosController implements Controller {
     try {
       const result: getResult = await this.todosService.getAllTodos(req.id, page, limit);
       if (!result.todos?.length) {
-        return res.status(204).json({ 'message': 'No todos were found.' });
+        return res.sendStatus(204);
       }
       return res.json(result);
     } catch (err) {
+      console.log(err instanceof Error ? err.message : err);
       return res.sendStatus(404);
     }
   }
@@ -89,11 +90,11 @@ class TodosController implements Controller {
    * @param res Response object for sending the added todo.
    * @returns Resolves with the added todo or sends appropriate status codes.
    */
-  private addTodo = async (req: RequestWithUserId, res: Response) => {
+  public addTodo = async (req: RequestWithUserId, res: Response) => {
     console.log('Add todo request.\n');
     const { name, deadline } = req.body;
     if (!name) {
-      return res.status(400).json({ 'message': 'Todo name is required.' });
+      return res.status(400).json({ message: 'Todo name is required.' });
     }
     try {
       const todo = await this.todosService.addTodo(
@@ -102,8 +103,8 @@ class TodosController implements Controller {
       return res.status(201).json(todo);
       // return res.sendStatus(201);
     } catch (err) {
-      console.error(err);
-      return res.status(500).json({ 'message': err instanceof Error ? err.message : 'An unexpected error occurred while processing your request.' });
+      console.log(err instanceof Error ? err.message : err);
+      return res.status(500).json({ message: err instanceof Error ? err.message : 'An unexpected error occurred while processing your request.' });
     }
   }
 
@@ -114,10 +115,10 @@ class TodosController implements Controller {
    * @returns Resolves with the updated todo or sends appropriate status codes.
    */
   // http://localhost:3000/todos?id=:id
-  private updateTodo = async (req: RequestWithUserId, res: Response) => {
+  public updateTodo = async (req: RequestWithUserId, res: Response) => {
     console.log('Update todo request.\n');
     if (!req.query?.id) {
-      return res.status(400).json({ 'message': 'Todo ID is required.' });
+      return res.status(400).json({ message: 'Todo ID is required.' });
     }
     let todo;
     const { checked, name, deadline } = req.body;
@@ -139,7 +140,8 @@ class TodosController implements Controller {
 
       return res.json(result);
     } catch (err) {
-      return res.status(404).json({ 'message': err instanceof Error ? err.message : 'An unexpected error occurred.' });
+      console.log(err instanceof Error ? err.message : err);
+      return res.status(404).json({ message: 'An unexpected error occurred.' });
     }
   }
 
@@ -150,10 +152,10 @@ class TodosController implements Controller {
    * @returns Resolves with the result of the deletion or sends appropriate status codes.
    */
   // http://localhost:3000/todos?id=:id
-  private deleteTodo = async (req: RequestWithUserId, res: Response) => {
+  public deleteTodo = async (req: RequestWithUserId, res: Response) => {
     console.log('Delete todo request.\n');
     if (!req.query?.id) {
-      return res.status(400).json({ 'message': 'Todo ID is required.' });
+      return res.status(400).json({ message: 'Todo ID is required.' });
     }
     try {
       const result = await this.todosService.deleteTodo(
@@ -161,7 +163,8 @@ class TodosController implements Controller {
       );
       return res.json(result);
     } catch (err) {
-      return res.status(404).json({ 'message': err instanceof Error ? err.message : 'An unexpected error has occurred.' });
+      console.log(err instanceof Error ? err.message : err);
+      return res.status(404).json({ message: 'An unexpected error has occurred.' });
     }
   }
 }

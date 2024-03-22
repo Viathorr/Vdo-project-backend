@@ -55,7 +55,6 @@ class TodosService {
       }
       return result;
     } catch (err) {
-      console.log(err);
       throw new Error('An unexpected error occurred while processing your request.');
     }
   }
