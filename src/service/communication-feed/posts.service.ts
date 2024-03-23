@@ -9,9 +9,9 @@ import CommentsService from "./comments.service";
 import { paginationInfo } from "../paginationInfo.utility";
 import { PostDto } from "../../dto/post.dto";
 
-type postInfo = {
+export type postInfo = {
   content: string,
-  created_at: Date,
+  created_at?: Date,
   username: string,
   likes: number,  
   comments: number

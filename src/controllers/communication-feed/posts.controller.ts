@@ -10,7 +10,7 @@ import { PostDtoBuilder } from '../../dto/post.dto';
 class PostsController implements Controller {
   public path: string = '/posts';
   public router: Router = Router();
-  private postsService: PostsService = new PostsService();
+  public postsService: PostsService = new PostsService();
   private postDtoBuilder: PostDtoBuilder = new PostDtoBuilder();
 
   constructor() {
@@ -50,8 +50,8 @@ class PostsController implements Controller {
    * Handles GET request to fetch all posts.
    * @param req Request object containing query parameters: page and limit.
    * @param res Response object to send back the result.
-   */
-  private getPosts = async (req: RequestWithUserId, res: Response) => {
+   */ 
+  public getPosts = async (req: RequestWithUserId, res: Response) => {
     console.log('Get all posts request');
     const page: number = parseInt(req.query.page as string) || 1;
     const limit: number = parseInt(req.query.limit as string) || 10;
@@ -64,7 +64,7 @@ class PostsController implements Controller {
       return res.status(200).json(result);
     } catch (err) {
       console.log(err instanceof Error ? err.message : err);
-      return res.sendStatus(404);
+      return res.sendStatus(400);
     }
   }
 
@@ -75,7 +75,7 @@ class PostsController implements Controller {
    * @param req Request object containing query parameters: page and limit.
    * @param res Response object to send back the result.
    */
-  private getUserPosts = async (req: RequestWithUserId, res: Response) => {
+  public getUserPosts = async (req: RequestWithUserId, res: Response) => {
     console.log('Get user posts request');
     const page: number = parseInt(req.query.page as string) || 1;
     const limit: number = parseInt(req.query.limit as string) || 10;
@@ -88,7 +88,7 @@ class PostsController implements Controller {
       return res.status(200).json(result);
     } catch (err) {
       console.log(err instanceof Error ? err.message : err);
-      return res.sendStatus(404);
+      return res.sendStatus(400);
     }
   }
    
@@ -99,7 +99,7 @@ class PostsController implements Controller {
    * @param req Request object containing query parameters: page and limit.
    * @param res Response object to send back the result.
    */
-  private getSavedPosts = async (req: RequestWithUserId, res: Response) => {
+  public getSavedPosts = async (req: RequestWithUserId, res: Response) => {
     console.log('Get saved posts request');
     const page: number = parseInt(req.query.page as string) || 1;
     const limit: number = parseInt(req.query.limit as string) || 10;
@@ -111,9 +111,8 @@ class PostsController implements Controller {
       }
       return res.status(200).json(result);
     } catch (err) {
-      console.log(err);
       console.log(err instanceof Error ? err.message : err);
-      return res.sendStatus(500);
+      return res.sendStatus(400);
     }
   }
 
@@ -124,7 +123,7 @@ class PostsController implements Controller {
    * @param req Request object containing the post ID in the URL.
    * @param res Response object to send back the result.
    */
-  private getPost = async (req: RequestWithUserId, res: Response) => {
+  public getPost = async (req: RequestWithUserId, res: Response) => {
     console.log('Get certain post request');
     try {
       const result: getPostResult = await this.postsService.getPost(this.postDtoBuilder.addId(parseInt(req.params.id)).addUserId(req.id).build());
@@ -140,7 +139,7 @@ class PostsController implements Controller {
    * @param req Request object containing the post content in the body.
    * @param res Response object to send back the result.
    */
-  private addPost = async (req: RequestWithUserId, res: Response) => {
+  public addPost = async (req: RequestWithUserId, res: Response) => {
     console.log('Add post request');
     const { content } = req.body;
     if (!content) {
@@ -160,7 +159,7 @@ class PostsController implements Controller {
    * @param req Request object containing the post ID in the URL and updated content in the body.
    * @param res Response object to send back the result.
    */
-  private updatePost = async (req: RequestWithUserId, res: Response) => {
+  public updatePost = async (req: RequestWithUserId, res: Response) => {
     console.log('Update post request');
     const { content } = req.body;
     if (!content) {
@@ -181,7 +180,7 @@ class PostsController implements Controller {
    * @param req Request object containing the post ID in the URL.
    * @param res Response object to send back the result.
    */
-  private deletePost = async (req: RequestWithUserId, res: Response) => {
+  public deletePost = async (req: RequestWithUserId, res: Response) => {
     console.log('Delete post request');
     try {
       const result = await this.postsService.deletePost(this.postDtoBuilder.addId(parseInt(req.params.id)).addUserId(req.id).build());
