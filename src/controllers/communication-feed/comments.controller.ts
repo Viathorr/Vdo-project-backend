@@ -9,7 +9,7 @@ import CommentsService, { getCommentsResult } from '../../service/communication-
 class CommentsController implements Controller {
   public path: string = '/comments';
   public router: Router = Router();
-  private commentsService: CommentsService = new CommentsService();
+  public commentsService: CommentsService = new CommentsService();
 
   constructor() {
     this.initializeRoutes();
@@ -34,7 +34,7 @@ class CommentsController implements Controller {
    * @param req Request object containing query parameters: post_id, page, limit.
    * @param res Response object to send back the result.
    */
-  private getComments = async (req: RequestWithUserId, res: Response) => {
+  public getComments = async (req: RequestWithUserId, res: Response) => {
     console.log('Get comments request');
     const postId: number = parseInt(req.query.post_id as string);
     const page: number = parseInt(req.query.page as string) || 1;
@@ -60,7 +60,7 @@ class CommentsController implements Controller {
    * @param req Request object containing query parameters: post_id and comment content in the body.
    * @param res Response object to send back the result.
    */
-  private addComment = async (req: RequestWithUserId, res: Response) => {
+  public addComment = async (req: RequestWithUserId, res: Response) => {
     console.log('Add comment request');
     const postId: number = parseInt(req.query.post_id as string);
     const { content } = req.body;
@@ -83,7 +83,7 @@ class CommentsController implements Controller {
    * @param req Request object containing query parameters: post_id and comment_id.
    * @param res Response object to send back the result.
    */
-  private deleteComment = async (req: RequestWithUserId, res: Response) => {
+  public deleteComment = async (req: RequestWithUserId, res: Response) => {
     console.log('Delete comment request');
     const postId: number = parseInt(req.query.post_id as string);
     const commentId: number = parseInt(req.query.comment_id as string);

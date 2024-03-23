@@ -3,7 +3,7 @@ import { Comment } from "../../entity/communication-feed/comment.entity";
 import { DeleteResult, InsertResult, Repository } from "typeorm";
 import { paginationInfo } from "../paginationInfo.utility"; 
 
-type commentInfo = {
+export type commentInfo = {
   content: string,
   created_at: Date,
   username: string,
