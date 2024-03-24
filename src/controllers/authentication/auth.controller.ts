@@ -6,7 +6,7 @@ import { UserDtoBuilder } from "../../dto/user.dto";
 /**
  * Controller for handling authentication operation.
  */
-class AuthController implements Controller {
+export class AuthController implements Controller {
   public path: string = '/auth';
   public router: Router = Router();
   public authenticationService: AuthenticationService = new AuthenticationService();

@@ -3,7 +3,7 @@ import { Router } from "express";
 import { Request, Response } from "express";
 
 // not going to create unittests because this controller will change
-class ScheduleController {
+export class ScheduleController {
   path: string = '/schedule';
   router: Router = Router();
    

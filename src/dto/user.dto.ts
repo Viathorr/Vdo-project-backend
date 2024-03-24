@@ -125,7 +125,7 @@ class UserDtoBuilder extends DtoBuilder<UserDto> {
 
   /**
    * Sets the email of the user.
-   * @param name The user's email.
+   * @param email The user's email.
    * @returns The UserDtoBuilder instance.
    */
   public addEmail = (email: string) => {
@@ -135,7 +135,7 @@ class UserDtoBuilder extends DtoBuilder<UserDto> {
 
   /**
    * Sets the country of the user.
-   * @param name The user's country.
+   * @param country The user's country.
    * @returns The UserDtoBuilder instance.
    */
   public addCountry = (country: string) => {
@@ -145,7 +145,7 @@ class UserDtoBuilder extends DtoBuilder<UserDto> {
 
   /**
    * Sets the profile picture URL of the user.
-   * @param name The URL of the user's profile picture.
+   * @param profilePictureUrl The URL of the user's profile picture.
    * @returns The UserDtoBuilder instance.
    */
   public addProfilePicture = (profilePictureUrl: string) => {

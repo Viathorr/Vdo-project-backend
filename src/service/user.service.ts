@@ -19,9 +19,7 @@ class UserService {
    */
   public async getUserData(userData: UserDto): Promise<UserDto> {
     try {
-      console.log('user id:', userData.id);
       const user: User | null = await this.userRepository.findOneBy({ id: userData.id });
-      console.log('user:', user);
       if (!user) { 
         throw new Error('No user with such ID.');
       } else {

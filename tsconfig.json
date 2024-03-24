@@ -116,6 +116,7 @@
   "include": ["./src/**/*.tsx", "./src/**/*.ts"],
   "typedocOptions": {
     "out": "docs",
+    "exclude": "./src/**/*.test.ts",
     "entryPointStrategy": "expand",
     "entryPoints": ["src"],
     "visibilityFilters": {

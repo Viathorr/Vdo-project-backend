@@ -6,7 +6,7 @@ import AuthenticationService from "../../service/authentication.service";
 /**
  * Controller for handling register operation.
  */
-class RegisterController implements Controller {
+export class RegisterController implements Controller {
   public path: string = '/register';
   public router: Router = Router();
   public authenticationService: AuthenticationService = new AuthenticationService();

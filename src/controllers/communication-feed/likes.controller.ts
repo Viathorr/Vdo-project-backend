@@ -3,11 +3,10 @@ import Controller from '../../interfaces/controller.interface';
 import RequestWithUserId from '../../interfaces/requestWithUserId.interface';
 import LikesService from '../../service/communication-feed/likes.service';
 
-
 /**
  * Controller handling routes related to likes on posts.
  */
-class LikesController implements Controller {
+export class LikesController implements Controller {
   public path: string = '/likes';
   public router: Router = Router();
   public likesService: LikesService = new LikesService();

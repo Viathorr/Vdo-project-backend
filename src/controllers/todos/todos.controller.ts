@@ -10,11 +10,10 @@ import {
 } from "../../service/todos/todosSortingStrategy";
 import { TodosActiveFilter, TodosCompletedFilter } from "../../service/todos/todosFilteringStrategy";
 
-
 /**
  * Controller for handling todo-related operations.
  */
-class TodosController implements Controller {
+export class TodosController implements Controller {
   public path: string = '/todos';
   public router: Router = Router();
   public todosService: TodosService = new TodosService();

@@ -5,7 +5,7 @@ import AuthenticationService from "../../service/authentication.service";
 /**
  * Controller for handling refresh token operation.
  */
-class RefreshTokenController implements Controller {
+export class RefreshTokenController implements Controller {
   public path: string = '/refresh';
   public router: Router = Router();
   public authenticationService: AuthenticationService = new AuthenticationService();

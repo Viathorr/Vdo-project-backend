@@ -7,7 +7,7 @@ import { PostDtoBuilder } from '../../dto/post.dto';
 /**
  * Controller handling routes related to posts.
  */
-class PostsController implements Controller {
+export class PostsController implements Controller {
   public path: string = '/posts';
   public router: Router = Router();
   public postsService: PostsService = new PostsService();

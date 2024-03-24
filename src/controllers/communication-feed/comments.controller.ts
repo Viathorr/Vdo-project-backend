@@ -6,7 +6,7 @@ import CommentsService, { getCommentsResult } from '../../service/communication-
 /**
  * Controller handling routes related to comments on posts.
  */
-class CommentsController implements Controller {
+export class CommentsController implements Controller {
   public path: string = '/comments';
   public router: Router = Router();
   public commentsService: CommentsService = new CommentsService();

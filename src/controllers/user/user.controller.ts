@@ -20,10 +20,10 @@ const imageUploadPath = process.env.UPLOADED_FILES_URL as string;
 /**
  * Controller handling user-related routes.
  */
-class UserController implements Controller {
+export class UserController implements Controller {
   public path: string = '/user';
   public router: Router = Router();
-  private userService: UserService = new UserService();
+  public userService: UserService = new UserService();
   private bucket = getStorage().bucket();
   private userDtoBuilder: UserDtoBuilder = new UserDtoBuilder();
 
@@ -79,14 +79,13 @@ class UserController implements Controller {
    * @param req Express request object with user ID.
    * @param res Express response object.
    */
-  private getUserInfo = async (req: RequestWithUserId, res: Response) => {
+  public getUserInfo = async (req: RequestWithUserId, res: Response) => {
     console.log('Get user info request');
     try {
-      console.log('user id:', req.id);
       const user: UserDto = await this.userService.getUserData(this.userDtoBuilder.addId(req.id).build());
       return res.status(200).json(user);
     } catch (err) {
-      console.log(err);
+      console.log(err instanceof Error ? err.message : err);
       return res.sendStatus(404);
     }
   } 
@@ -96,7 +95,7 @@ class UserController implements Controller {
    * @param req Express request object with user ID and updated information.
    * @param res Express response object.
    */
-  private changeUserInfo = async (req: RequestWithUserId, res: Response) => {
+  public changeUserInfo = async (req: RequestWithUserId, res: Response) => {
     console.log('Change user info request');
     const { name, country, phoneNum } = req.body;
     if (!name && !country && !phoneNum) {
@@ -110,7 +109,7 @@ class UserController implements Controller {
       console.log("Changing username result: ", result);
       return res.status(200).json({ message: "Success" });
     } catch (err) {
-      console.log(err);
+      console.log(err instanceof Error ? err.message : err);
       return res.status(400).json({ message: 'Failed to change user info.' });
     }
   };
@@ -157,7 +156,7 @@ class UserController implements Controller {
         await this.userService.setProfileImage(this.userDtoBuilder.addId(req.id).build(), downloadURL);
         return res.json({ downloadURL });
       } catch (err: any) {
-        console.log(err);
+        console.log(err instanceof Error ? err.message : err);
         return res.sendStatus(500);
       }
     });
@@ -170,7 +169,7 @@ class UserController implements Controller {
    * @param req Express request object with user ID and new passwords.
    * @param res Express response object.
    */
-  private changePassword = async (req: RequestWithUserId, res: Response) => {
+  public changePassword = async (req: RequestWithUserId, res: Response) => {
     console.log('Change password request');
     const { currPassword, newPassword } = req.body;
     if (!currPassword || !newPassword) {
@@ -183,7 +182,7 @@ class UserController implements Controller {
       console.log("Changing password result: ", result);
       return res.status(201).json({ message: 'Success' });
     } catch (err) {
-      console.log(err);
+      console.log(err instanceof Error ? err.message : err);
       return res.status(400).json({ message: err instanceof Error ? err.message : 'Failed to change password.' });
     }
   };
@@ -193,7 +192,7 @@ class UserController implements Controller {
    * @param req Express request object with user ID.
    * @param res Express response object.
    */
-  private deleteAccount = async (req: RequestWithUserId, res: Response) => {
+  public deleteAccount = async (req: RequestWithUserId, res: Response) => {
     console.log('Delete account request');
     try {
       const result = await this.userService.deleteUser(this.userDtoBuilder.addId(req.id).build());
@@ -201,7 +200,7 @@ class UserController implements Controller {
       res.clearCookie('refreshToken', { httpOnly: true, sameSite: 'none', secure: true, maxAge: 24 * 60 * 60 * 1000 });
       return res.status(200).json({ message: result });
     } catch (err) {
-      console.log(err);
+      console.log(err instanceof Error ? err.message : err);
       return res.status(400).json({ message: 'Fail' });
     }
   };

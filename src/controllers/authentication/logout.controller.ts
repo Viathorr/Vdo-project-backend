@@ -1,8 +1,11 @@
-import e, { Router, Request, Response } from "express";
+import { Router, Request, Response } from "express";
 import Controller from "../../interfaces/controller.interface";
 import AuthenticationService from "../../service/authentication.service";
 
-class LogoutController implements Controller {
+/**
+ * Controller for handling logout operation.
+ */
+export class LogoutController implements Controller {
   public path: string = '/logout';
   public router: Router = Router();
   public authenticationService: AuthenticationService = new AuthenticationService();
