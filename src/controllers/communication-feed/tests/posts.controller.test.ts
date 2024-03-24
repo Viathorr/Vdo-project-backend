@@ -351,265 +351,264 @@ describe('get post', () => {
   });
 
   it('should send post info', async () => {
-    
+    mockGetPost.mockResolvedValue({
+      id: 1,
+      content: 'mock post',
+      created_at: new Date(2024, 12, 12, 12, 0, 0, 0),
+      updated_at: new Date(2024, 12, 12, 12, 0, 0, 0)
+    });
+
+    const mockReq = httpMocks.createRequest<RequestWithUserId>({
+      id: 1,
+      params: {
+        id: 1
+      }
+    });
+    const mockRes = httpMocks.createResponse<Response>();
+
+    await postsController.getPost(mockReq, mockRes);
+
+    expect(mockRes._getJSONData()).toEqual({
+      id: 1,
+      content: 'mock post',
+      created_at: '2025-01-12T10:00:00.000Z',
+      updated_at: '2025-01-12T10:00:00.000Z'
+    });
+    expect(mockRes._isEndCalled).toBeTruthy();
+    expect(mockRes.statusCode).toBe(200);
+  });
+  
+  it('should send 404 error if post was not found or some error occurred', async () => {
+    const mockError = new Error('Mock Error');
+    mockGetPost.mockRejectedValue(mockError);
+
+    const mockReq = httpMocks.createRequest<RequestWithUserId>({
+      id: 1,
+      params: {
+        id: 1
+      }
+    });
+    const mockRes = httpMocks.createResponse<Response>();
+
+    await postsController.getPost(mockReq, mockRes);
+
+    expect(console.log).toHaveBeenCalledWith(mockError.message);
+    expect(mockGetPost).toHaveBeenCalledWith({
+      id: 1,
+      userId: 1
+    });
+    expect(mockRes.statusCode).toBe(404);
+    expect(mockRes._isEndCalled()).toBeTruthy();
   });
 });
 
-// describe('add Post', () => {
-//   const mockAddPost = jest.spyOn(postsController.postsService, 'addPost');
+describe('add Post', () => {
+  const mockAddPost = jest.spyOn(postsController.postsService, 'addPost');
 
-//   beforeEach(() => {
-//     jest.spyOn(console, 'log').mockImplementation(() => { });
-//   });
+  beforeEach(() => {
+    jest.spyOn(console, 'log').mockImplementation(() => { });
+  });
 
-//   afterEach(() => {
-//     jest.clearAllMocks();
-//   });
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
 
-//   it('should create Post and send it', async () => {
-//     mockAddPost.mockResolvedValue(
-//       {
-//         id: 1,
-//         content: 'Post1',
-//         checked: false
-//       }
-//     );
+  it('should create Post and send it', async () => {
+    mockAddPost.mockResolvedValue('Success');
 
-//     const mockReq = httpMocks.createRequest<RequestWithUserId>({
-//       id: 1,
-//       body: {
-//         content: 'Post1'
-//       }
-//     });
-//     const mockRes = httpMocks.createResponse<Response>();
+    const mockReq = httpMocks.createRequest<RequestWithUserId>({
+      id: 1,
+      body: {
+        content: 'Post1'
+      }
+    });
+    const mockRes = httpMocks.createResponse<Response>();
 
-//     await postsController.addPost(mockReq, mockRes);
+    await postsController.addPost(mockReq, mockRes);
 
-//     expect(mockAddPost).toHaveBeenCalledTimes(1);
-//     expect(mockAddPost).toHaveBeenCalledWith({
-//       content: 'Post1',
-//       deadline: undefined,
-//       userId: 1
-//     });
-//     expect(mockRes.statusCode).toBe(201);
-//     expect(mockRes._isEndCalled()).toBeTruthy();
-//     expect(mockRes._getJSONData()).toEqual({
-//       id: 1,
-//       content: 'Post1',
-//       checked: false
-//     });
-//   });
+    expect(mockAddPost).toHaveBeenCalledTimes(1);
+    expect(mockAddPost).toHaveBeenCalledWith({
+      content: 'Post1',
+      userId: 1
+    });
+    expect(mockRes.statusCode).toBe(201);
+    expect(mockRes._isEndCalled()).toBeTruthy();
+    expect(mockRes._getJSONData()).toEqual({
+      message: 'Success'
+    });
+  });
   
-//   it('should send 400 error if no Post content provided', async () => {
-//     const mockReq = httpMocks.createRequest<RequestWithUserId>({ id: 1 });
-//     const mockRes = httpMocks.createResponse<Response>();
+  it('should send 400 error if no post content provided', async () => {
+    const mockReq = httpMocks.createRequest<RequestWithUserId>({ id: 1 });
+    const mockRes = httpMocks.createResponse<Response>();
 
-//     await postsController.addPost(mockReq, mockRes);
+    await postsController.addPost(mockReq, mockRes);
 
-//     expect(mockRes.statusCode).toBe(400);
-//     expect(mockRes._isEndCalled()).toBeTruthy();
-//     expect(mockRes._getJSONData()).toEqual({ message: 'Post content is required.' });
-//   });
+    expect(mockRes.statusCode).toBe(400);
+    expect(mockRes._isEndCalled()).toBeTruthy();
+    expect(mockRes._getJSONData()).toEqual({ message: 'Post content is required.' });
+  });
   
-//   it('should send 500 error if some error occurred', async () => {
-//     const mockError = new Error('Mock Error');
-//     mockAddPost.mockRejectedValue(mockError);
+  it('should send 500 error if some error occurred', async () => {
+    const mockError = new Error('Mock Error');
+    mockAddPost.mockRejectedValue(mockError);
 
-//     const mockReq = httpMocks.createRequest<RequestWithUserId>({
-//       id: 1,
-//       body: {
-//         content: 'Post1'
-//       }
-//     });
-//     const mockRes = httpMocks.createResponse<Response>();
+    const mockReq = httpMocks.createRequest<RequestWithUserId>({
+      id: 1,
+      body: {
+        content: 'Post1'
+      }
+    });
+    const mockRes = httpMocks.createResponse<Response>();
 
-//     await postsController.addPost(mockReq, mockRes);
+    await postsController.addPost(mockReq, mockRes);
 
-//     expect(console.log).toHaveBeenLastCalledWith(mockError.message);
-//     expect(mockRes.statusCode).toBe(500);
-//     expect(mockRes._getJSONData()).toEqual({ message: mockError.message });
-//     expect(mockRes._isEndCalled()).toBeTruthy();
-//   });
-// });
+    expect(console.log).toHaveBeenLastCalledWith(mockError.message);
+    expect(mockRes.statusCode).toBe(500);
+    expect(mockRes._isEndCalled()).toBeTruthy();
+  });
+});
 
-// describe('update Post', () => {
-//   const mockUpdatePost = jest.spyOn(postsController.postService, 'updatePost');
+describe('update Post', () => {
+  const mockUpdatePost = jest.spyOn(postsController.postsService, 'updatePost');
 
-//   beforeEach(() => {
-//     jest.spyOn(console, 'log').mockImplementation(() => { });
-//   });
+  beforeEach(() => {
+    jest.spyOn(console, 'log').mockImplementation(() => { });
+  });
 
-//   afterEach(() => {
-//     jest.clearAllMocks();
-//   });
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
 
-//   it('should update Post and send it', async () => {
-//     mockUpdatePost.mockResolvedValue(
-//       {
-//         id: 1,
-//         content: 'PostChanged',
-//         checked: false
-//       } as Post
-//     );
+  it('should update Post and send it', async () => {
+    mockUpdatePost.mockImplementation(jest.fn());
 
-//     const mockReq = httpMocks.createRequest<RequestWithUserId>({
-//       id: 1,
-//       query: {
-//         id: 1
-//       },
-//       body: {
-//         content: 'PostChanged'
-//       }
-//     });
-//     const mockRes = httpMocks.createResponse<Response>();
+    const mockReq = httpMocks.createRequest<RequestWithUserId>({
+      id: 1,
+      params: {
+        id: 1
+      },
+      body: {
+        content: 'PostChanged'
+      }
+    });
+    const mockRes = httpMocks.createResponse<Response>();
 
-//     await postsController.updatePost(mockReq, mockRes);
+    await postsController.updatePost(mockReq, mockRes);
 
-//     expect(mockUpdatePost).toHaveBeenCalledTimes(1);
-//     expect(mockUpdatePost).toHaveBeenCalledWith({
-//       id: 1,
-//       content: 'PostChanged',
-//       deadline: undefined,
-//       userId: 1
-//     });
-//     expect(mockRes.statusCode).toBe(200);
-//     expect(mockRes._isEndCalled()).toBeTruthy();
-//     expect(mockRes._getJSONData()).toEqual({
-//       id: 1,
-//       content: 'PostChanged',
-//       checked: false
-//     });
-//   });
+    expect(mockUpdatePost).toHaveBeenCalledTimes(1);
+    expect(mockUpdatePost).toHaveBeenCalledWith({
+      id: 1,
+      content: 'PostChanged',
+      userId: 1
+    });
+    expect(mockRes.statusCode).toBe(200);
+    expect(mockRes._isEndCalled()).toBeTruthy();
+  });
   
-//   it('should send 400 error if no Post id provided', async () => {
-//     const mockReq = httpMocks.createRequest<RequestWithUserId>({
-//       id: 1
-//     });
-//     const mockRes = httpMocks.createResponse<Response>();
+  it('should send 400 error if no post content provided', async () => {
+    const mockReq = httpMocks.createRequest<RequestWithUserId>({
+      id: 1,
+      params: {
+        id: 1
+      }
+    });
+    const mockRes = httpMocks.createResponse<Response>();
 
-//     await postsController.updatePost(mockReq, mockRes);
+    await postsController.updatePost(mockReq, mockRes);
 
-//     expect(mockRes.statusCode).toBe(400);
-//     expect(mockRes._isEndCalled()).toBeTruthy();
-//     expect(mockRes._getJSONData()).toEqual({ message: 'Post ID is required.' });
-//   });
-
-//   it('should send 204 status code if no Post info provided', async () => {
-//     const mockReq = httpMocks.createRequest<RequestWithUserId>({
-//       id: 1,
-//       query: {
-//         id: 1
-//       }
-//     });
-//     const mockRes = httpMocks.createResponse<Response>();
-
-//     await postsController.updatePost(mockReq, mockRes);
-
-//     expect(mockRes.statusCode).toBe(204);
-//     expect(mockRes._isEndCalled()).toBeTruthy();
-//   });
+    expect(mockRes.statusCode).toBe(400);
+    expect(mockRes._isEndCalled()).toBeTruthy();
+    expect(mockRes._getJSONData()).toEqual({ message: 'Post content is required.' });
+  });
   
-//   it('should send 404 error if some error occurred', async () => {
-//     const mockError = new Error('Mock Error');
-//     mockUpdatePost.mockRejectedValue(mockError);
+  it('should send 404 error if no post with provided id was found or some error occurred', async () => {
+    const mockError = new Error('Mock Error');
+    mockUpdatePost.mockRejectedValue(mockError);
 
-//     const mockReq = httpMocks.createRequest<RequestWithUserId>({
-//       id: 1,
-//       query: {
-//         id: 1
-//       },
-//       body: {
-//         content: 'PostChanged'
-//       }
-//     });
-//     const mockRes = httpMocks.createResponse<Response>();
+    const mockReq = httpMocks.createRequest<RequestWithUserId>({
+      id: 1,
+      params: {
+        id: 1
+      },
+      body: {
+        content: 'PostChanged'
+      }
+    });
+    const mockRes = httpMocks.createResponse<Response>();
 
-//     await postsController.updatePost(mockReq, mockRes);
+    await postsController.updatePost(mockReq, mockRes);
 
-//     expect(mockUpdatePost).toHaveBeenCalledWith({
-//       id: 1,
-//       content: 'PostChanged',
-//       deadline: undefined,
-//       userId: 1
-//     });
-//     expect(console.log).toHaveBeenLastCalledWith(mockError.message);
-//     expect(mockRes.statusCode).toBe(404);
-//     expect(mockRes._getJSONData()).toEqual({ message: 'An unexpected error occurred.' });
-//     expect(mockRes._isEndCalled()).toBeTruthy();
-//   });
-// });
+    expect(mockUpdatePost).toHaveBeenCalledWith({
+      id: 1,
+      content: 'PostChanged',
+      userId: 1
+    });
+    expect(console.log).toHaveBeenLastCalledWith(mockError.message);
+    expect(mockRes.statusCode).toBe(404);
+    expect(mockRes._getJSONData()).toEqual({ message: 'Fail' });
+    expect(mockRes._isEndCalled()).toBeTruthy();
+  });
+});
 
-// describe('delete Post', () => {
-//   const mockDeletePost = jest.spyOn(postsController.postService, 'deletePost');
+describe('delete Post', () => {
+  const mockDeletePost = jest.spyOn(postsController.postsService, 'deletePost');
 
-//   beforeEach(() => {
-//     jest.spyOn(console, 'log').mockImplementation(() => { });
-//   });
+  beforeEach(() => {
+    jest.spyOn(console, 'log').mockImplementation(() => { });
+  });
 
-//   afterEach(() => {
-//     jest.clearAllMocks();
-//   });
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
 
-//   it('should delete Post and send success message', async () => {
-//     mockDeletePost.mockResolvedValue({ message: 'Success'});
+  it('should delete Post and send success message', async () => {
+    mockDeletePost.mockResolvedValue({ message: 'Success'});
 
-//     const mockReq = httpMocks.createRequest<RequestWithUserId>({
-//       id: 1,
-//       query: {
-//         id: 1
-//       }
-//     });
-//     const mockRes = httpMocks.createResponse<Response>();
+    const mockReq = httpMocks.createRequest<RequestWithUserId>({
+      id: 1,
+      params: {
+        id: 1
+      }
+    });
+    const mockRes = httpMocks.createResponse<Response>();
 
-//     await postsController.deletePost(mockReq, mockRes);
+    await postsController.deletePost(mockReq, mockRes);
 
-//     expect(mockDeletePost).toHaveBeenCalled();
-//     expect(mockDeletePost).toHaveBeenCalledWith({
-//       id: 1,
-//       userId: 1
-//     });
-//     expect(mockRes.statusCode).toBe(200);
-//     expect(mockRes._getJSONData()).toEqual({ message: 'Success' });
-//     expect(mockRes._isEndCalled()).toBeTruthy();
-//   });
+    expect(mockDeletePost).toHaveBeenCalled();
+    expect(mockDeletePost).toHaveBeenCalledWith({
+      id: 1,
+      userId: 1
+    });
+    expect(mockRes.statusCode).toBe(200);
+    expect(mockRes._getJSONData()).toEqual({ message: 'Success' });
+    expect(mockRes._isEndCalled()).toBeTruthy();
+  });
 
-//   it('should send 400 error if no Post id provided', async () => {
-//     const mockReq = httpMocks.createRequest<RequestWithUserId>({
-//       id: 1
-//     });
-//     const mockRes = httpMocks.createResponse<Response>();
+  it('should send 404 error if no post with provided id was not found some error occurred', async () => {
+    const mockError = new Error('Mock Error');
+    mockDeletePost.mockRejectedValue(mockError);
 
-//     await postsController.deletePost(mockReq, mockRes);
+    const mockReq = httpMocks.createRequest<RequestWithUserId>({
+      id: 1,
+      params: {
+        id: 1
+      }
+    });
+    const mockRes = httpMocks.createResponse<Response>();
 
-//     expect(mockRes.statusCode).toBe(400);
-//     expect(mockRes._isEndCalled()).toBeTruthy();
-//     expect(mockRes._getJSONData()).toEqual({ message: 'Post ID is required.' });
-//   });
+    await postsController.deletePost(mockReq, mockRes);
 
-//   it('should send 404 error if some error occurred', async () => {
-//     const mockError = new Error('Mock Error');
-//     mockDeletePost.mockRejectedValue(mockError);
-
-//     const mockReq = httpMocks.createRequest<RequestWithUserId>({
-//       id: 1,
-//       query: {
-//         id: 1
-//       }
-//     });
-//     const mockRes = httpMocks.createResponse<Response>();
-
-//     await postsController.deletePost(mockReq, mockRes);
-
-//     expect(mockDeletePost).toHaveBeenCalled();
-//     expect(mockDeletePost).toHaveBeenCalledWith({
-//       id: 1,
-//       userId: 1
-//     });
-//     expect(console.log).toHaveBeenLastCalledWith(mockError.message);
-//     expect(mockRes.statusCode).toBe(404);
-//     expect(mockRes._getJSONData()).toEqual({ message: 'An unexpected error has occurred.' });
-//     expect(mockRes._isEndCalled()).toBeTruthy();
-//   });
-// });
+    expect(mockDeletePost).toHaveBeenCalled();
+    expect(mockDeletePost).toHaveBeenCalledWith({
+      id: 1,
+      userId: 1
+    });
+    expect(console.log).toHaveBeenLastCalledWith(mockError.message);
+    expect(mockRes.statusCode).toBe(404);
+    expect(mockRes._getJSONData()).toEqual({ message: 'Fail' });
+    expect(mockRes._isEndCalled()).toBeTruthy();
+  });
+});
 
 

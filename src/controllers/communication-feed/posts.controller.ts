@@ -143,11 +143,11 @@ class PostsController implements Controller {
     console.log('Add post request');
     const { content } = req.body;
     if (!content) {
-      return res.status(400).json({ message: 'Content is required.' });
+      return res.status(400).json({ message: 'Post content is required.' });
     }
     try {
       const result: string = await this.postsService.addPost(this.postDtoBuilder.addContent(content).addUserId(req.id).build());
-      return res.json({ message: result });
+      return res.status(201).json({ message: result });
     } catch (err) {
       console.log(err instanceof Error ? err.message : err);
       return res.sendStatus(500);
@@ -163,7 +163,7 @@ class PostsController implements Controller {
     console.log('Update post request');
     const { content } = req.body;
     if (!content) {
-      return res.status(400).json({ message: 'Content is required.' });
+      return res.status(400).json({ message: 'Post content is required.' });
     }
     try {
       const result = await this.postsService.updatePost(this.postDtoBuilder.addId(parseInt(req.params.id)).addUserId(req.id).addContent(content).build());
@@ -171,7 +171,7 @@ class PostsController implements Controller {
       return res.sendStatus(200);
     } catch (err) {
       console.log(err instanceof Error ? err.message : err);
-      return res.status(400).json(err instanceof Error ? err.message : "Fail");
+      return res.status(404).json({ message: "Fail" });
     }
   }
   
@@ -188,7 +188,7 @@ class PostsController implements Controller {
       return res.json(result);
     } catch (err) {
       console.log(err instanceof Error ? err.message : err);
-      return res.status(400).json(err instanceof Error ? err.message : "Fail");
+      return res.status(404).json({ message: "Fail" });
     }
   }
 }
