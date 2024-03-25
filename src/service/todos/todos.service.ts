@@ -2,8 +2,8 @@ import { TodoDto } from "../../dto/todo.dto";
 import AppDataSource from "../../config/mysqlConn";
 import { Todo } from "../../entity/todo.entity";
 import { User } from "../../entity/user.entity";
-import {TodosSortingStrategy} from "./todosSortingStrategy";
-import {DeleteResult, InsertResult, Repository} from "typeorm";
+import { TodosSortingStrategy } from "./todosSortingStrategy";
+import { DeleteResult, InsertResult, Repository } from "typeorm";
  
 export type getResult = {
   prevPage?: number,
@@ -117,7 +117,7 @@ class TodosService {
       throw err;
     }
   }
-
+ 
   /**
    * Deletes an existing todo.
    * @param todoData The todo DTO containing todo data to be deleted.

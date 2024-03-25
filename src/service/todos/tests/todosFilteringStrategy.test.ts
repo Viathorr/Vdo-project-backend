@@ -1,5 +1,5 @@
 import { Todo } from "../../../entity/todo.entity";
-import { TodosActiveFilter, TodosCompletedFilter } from "../todosFilteringStrategy";
+import { TodosActiveFilter, TodosCompletedFilter } from "../todosFiltering";
 
 describe('active todos filtering', () => {
   const todosActiveFilter = new TodosActiveFilter();

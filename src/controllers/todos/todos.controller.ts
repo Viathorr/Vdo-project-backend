@@ -8,7 +8,7 @@ import {
   TodosSortingByNameStrategy,
   TodosSortingStrategy
 } from "../../service/todos/todosSortingStrategy";
-import { TodosActiveFilter, TodosCompletedFilter } from "../../service/todos/todosFilteringStrategy";
+import { TodosActiveFilter, TodosCompletedFilter } from "../../service/todos/todosFiltering";
 
 /**
  * Controller for handling todo-related operations.
@@ -52,7 +52,7 @@ export class TodosController implements Controller {
   public getTodos = async (req: RequestWithUserId, res: Response) => {
     console.log('Get todos request\n');
     const page: number = parseInt(req.query.page as string) || 1;
-    const limit: number = parseInt(req.query.limit as string) || 6;
+    const limit: number = parseInt(req.query.limit as string) || 5;
     const sort: string = req.query.s as string || 'name';
     const filter: string = req.query.f as string || 'all';
 
@@ -70,7 +70,7 @@ export class TodosController implements Controller {
     }
 
     this.todosService.setTodosSortingStrategy(sortingStrategy);
-
+ 
     try {
       const result: getResult = await this.todosService.getAllTodos(req.id, page, limit);
       if (!result.todos?.length) {
@@ -126,13 +126,17 @@ export class TodosController implements Controller {
       return res.sendStatus(204);
     }
 
+    this.todoDtoBuilder.addId(Number(req.query.id)).addUserId(req.id);
+
     if ('checked' in req.body) {
       // if todo was updated by clicking on checkbox, then the request will contain only 'checked' value
-      todo = this.todoDtoBuilder.addId(Number(req.query.id)).addChecked(checked).addUserId(req.id).build();
+      this.todoDtoBuilder.addChecked(checked);
     } else {
       // if todo info(name, deadline) was updated, then the request will contain only todo name and deadline with no 'checked' value
-      todo = this.todoDtoBuilder.addId(Number(req.query.id)).addName(name).addDeadline(deadline).addUserId(req.id).build();
+      this.todoDtoBuilder.addName(name).addDeadline(deadline);
     }
+
+    todo = this.todoDtoBuilder.build();
 
     try {
       const result = await this.todosService.updateTodo(todo);

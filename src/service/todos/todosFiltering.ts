@@ -26,7 +26,7 @@ export class TodosActiveFilter implements TodosFilter {
         return todos.filter(todo => !todo.checked);
     }
 }
- 
+  
 /**
  * Implementation of the TodosFilter interface for filtering completed todos.
  */

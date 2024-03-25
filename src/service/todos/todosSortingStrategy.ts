@@ -1,5 +1,5 @@
 import { Todo } from "../../entity/todo.entity";
-import { TodosFilter } from "./todosFilteringStrategy";
+import { TodosFilter } from "./todosFiltering";
 
 // Bridge & Strategy pattern
 /**
@@ -60,7 +60,7 @@ export class TodosSortingByNameStrategy extends ATodosSortingStrategy {
 
 /**
  * Implementation of TodosSortingStrategy for sorting todos by date.
- */
+ */ 
 export class TodosSortingByDateStrategy extends ATodosSortingStrategy {
     /**
      * Sorts the given array of todos by date.

@@ -83,7 +83,7 @@ describe('get all todos', () => {
     await todosController.getTodos(mockReq, mockRes);
 
     expect(mockGetAllTodos).toHaveBeenCalledTimes(1);
-    expect(mockGetAllTodos).toHaveBeenCalledWith(1, 1, 6);
+    expect(mockGetAllTodos).toHaveBeenCalledWith(1, 1, 5);
     expect(mockRes.statusCode).toBe(204);
     expect(mockRes._isEndCalled()).toBeTruthy();
   });
