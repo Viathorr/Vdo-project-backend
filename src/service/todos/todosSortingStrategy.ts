@@ -47,7 +47,8 @@ abstract class ATodosSortingStrategy implements TodosSortingStrategy {
  */
 export class TodosSortingByNameStrategy extends ATodosSortingStrategy {
     /**
-     * Sorts the given array of todos by name.
+     * Sorts the given array of todos by name in ascending order A...Z.
+     * Directly changes the given array, doesn't create any copies.
      * @param todos The array of todos to be sorted.
      * @returns The sorted array of todos.
      */
@@ -63,7 +64,10 @@ export class TodosSortingByNameStrategy extends ATodosSortingStrategy {
  */ 
 export class TodosSortingByDateStrategy extends ATodosSortingStrategy {
     /**
-     * Sorts the given array of todos by date.
+     * Sorts the given array of todos by deadline date (if given) in ascending order.
+     * Directly changes the given array, doesn't create any copies.
+     * If some todos are expired, they appear at the beginning, todos with no deadline appear at the end of list,
+     * other todos are sorted in ascending order by deadline (short deadline - at the beginning, long deadline - at the end)
      * @param todos The array of todos to be sorted.
      * @returns The sorted array of todos.
      */
