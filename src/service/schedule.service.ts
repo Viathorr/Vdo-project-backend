@@ -22,17 +22,16 @@ export type getScheduleResult = {
 }
 
 /**
- * Service class for managing Activity operations.
+ * Service class for managing activity operations.
  */
 class ScheduleService {
   private activityRepository: Repository<Activity> = AppDataSource.getRepository(Activity);
 
   /**
-   * Retrieves all Activities for a given user.
+   * Retrieves all activities for a given user and (if provided) for a given weekday.
    * @param userId The ID of the user.
-   * @param limit The maximum number of Activitys to retrieve per page.
-   * @returns An object containing Activitys and pagination information.
-   * @throws Error if some error occurred during the database query processing.
+   * @param dayName (if provided) The specific week day of which to fetch all activities.
+   * @returns An object containing activities needed information.
    */
   public async getAllActivities(userId: number, dayName?: string) {
     if (!dayName) {
@@ -66,7 +65,7 @@ class ScheduleService {
   /**
    * Adds a new activity.
    * @param activityData The activity DTO containing activity data to be added.
-   * @returns A promise that resolves to the newly added activity.
+   * @returns A promise that resolves to the result of adding new activity.
    */
   public async addActivity(activityData: ActivityDto) {
     await this.activityRepository.createQueryBuilder('activity').insert().into(Activity).values({
@@ -84,7 +83,7 @@ class ScheduleService {
   /**
    * Updates an existing Activity.
    * @param activityData The Activity DTO containing Activity data to be updated.
-   * @returns A promise that resolves to the updated Activity.
+   * @returns A promise that resolves to the result of updated activity operation.
    * @throws Error if no Activity with the specified ID is found or user ID doesn't match.
    */
   public async updateActivity(activityData: ActivityDto) {
@@ -128,10 +127,21 @@ class ScheduleService {
     }
   }
 
+  /**
+   * Filters activities by week day.
+   * @param activities The activities that have to be filtered.
+   * @param weekDay A name of day by which to filter activities.
+   * @returns Activities which have weekDay property the same as the provided weekDay param.
+   */
   private filterActivitiesByWeekDay(activities: Activity[], weekDay: string): Activity[] {
     return activities.filter(activity => activity.week_day === weekDay);
   }
 
+  /**
+   * Parses activities and returns only needed info about each of them.
+   * @param activities The activities that have to be parsed.
+   * @returns The array of only needed activities info.
+   */
   private parseActivities(activities: Activity[]): getActivityResult[] {
     return activities.map(activity => ({ id: activity.id, name: activity.name, weekDay: activity.week_day, url: activity.url, time: activity.timestamp }));
   }
