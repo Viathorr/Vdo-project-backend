@@ -70,7 +70,6 @@ class PostsService {
       
         const { postUserInfos, likesNums, commentsNums } = await this.getAllNeededPostsInformation(posts);
 
-        // think of getting rid of userinfo checking, because we already have that in our posts (because of left join)
         // @ts-ignore
         result.posts = posts.map((post, index) => ({
           content: post.content,
