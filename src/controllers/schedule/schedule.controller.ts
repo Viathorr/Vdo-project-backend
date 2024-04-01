@@ -35,20 +35,18 @@ export class ScheduleController {
       .delete(this.deleteActivity)
   }
 
-  // URL: http://localhost:3500/schedule?week_day:=day
+  // URL: http://localhost:3500/schedule
   /**
    * Handles GET request to retrieve activities.
-   * @param req Request object containing user ID and (not necessarily) weekDay property.
+   * @param req Request object containing user ID.
    * @param res Response object for sending the retrieved activities.
    * @returns Resolves with activities data or sends appropriate status codes.
    */
   public getSchedule = async (req: RequestWithUserId, res: Response) => {
     console.log('Get schedule request.');
-    const weekDay: string = req.query.week_day as string;
     try {
-      console.log(weekDay);
-      const result = await this.scheduleService.getAllActivities(req.id, weekDay);
-      return res.json({ result });
+      const result = await this.scheduleService.getAllActivities(req.id);
+      return res.json(result);
     } catch (err) {
       console.log(err instanceof Error ? err.message : err);
       return res.status(400).json({ message: err instanceof Error ? err.message : 'An unexpected error occurred while processing your request.' });
@@ -64,7 +62,9 @@ export class ScheduleController {
   public addActivity = async (req: RequestWithUserId, res: Response) => {
     console.log('Add activity request');
     const { name, dayName, time, url } = req.body;
+    console.log(req.body);
     if (!name || !dayName || !time) {
+      console.log('Activity name, day name and time are required.');
       return res.status(400).json({ message: 'Activity name, day name and time are required.' });
     }
     try {

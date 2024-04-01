@@ -30,36 +30,24 @@ class ScheduleService {
   /**
    * Retrieves all activities for a given user and (if provided) for a given weekday.
    * @param userId The ID of the user.
-   * @param dayName (if provided) The specific week day of which to fetch all activities.
    * @returns An object containing activities needed information.
    */
-  public async getAllActivities(userId: number, dayName?: string) {
-    if (!dayName) {
-      const activities: Activity[] = await this.activityRepository.createQueryBuilder('activities')
-      .leftJoinAndSelect('activities.creator', 'user')
-      .where('user_id = :userId', { userId })
-      .orderBy('activities.timestamp', 'ASC')
-      .getMany();
-      const result: getScheduleResult = {};
-      result.Monday = this.parseActivities(this.filterActivitiesByWeekDay(activities, 'Monday'));
-      result.Tuesday = this.parseActivities(this.filterActivitiesByWeekDay(activities, 'Tuesday'));
-      result.Wednesday = this.parseActivities(this.filterActivitiesByWeekDay(activities, 'Wednesday'));
-      result.Thursday = this.parseActivities(this.filterActivitiesByWeekDay(activities, 'Thursday'));
-      result.Friday = this.parseActivities(this.filterActivitiesByWeekDay(activities, 'Friday'));
-      result.Saturday = this.parseActivities(this.filterActivitiesByWeekDay(activities, 'Saturday'));
-      result.Sunday = this.parseActivities(this.filterActivitiesByWeekDay(activities, 'Sunday'));
+  public async getAllActivities(userId: number) {
+    const activities: Activity[] = await this.activityRepository.createQueryBuilder('activities')
+    .leftJoinAndSelect('activities.creator', 'user')
+    .where('user_id = :userId', { userId })
+    .orderBy('activities.timestamp', 'ASC')
+    .getMany();
+    const result: getScheduleResult = {};
+    result.Monday = this.parseActivities(this.filterActivitiesByWeekDay(activities, 'Monday'));
+    result.Tuesday = this.parseActivities(this.filterActivitiesByWeekDay(activities, 'Tuesday'));
+    result.Wednesday = this.parseActivities(this.filterActivitiesByWeekDay(activities, 'Wednesday'));
+    result.Thursday = this.parseActivities(this.filterActivitiesByWeekDay(activities, 'Thursday'));
+    result.Friday = this.parseActivities(this.filterActivitiesByWeekDay(activities, 'Friday'));
+    result.Saturday = this.parseActivities(this.filterActivitiesByWeekDay(activities, 'Saturday'));
+    result.Sunday = this.parseActivities(this.filterActivitiesByWeekDay(activities, 'Sunday'));
 
-      return result;
-    } else {
-      const activities: Activity[] = await this.activityRepository.createQueryBuilder('activities')
-      .leftJoinAndSelect('activities.creator', 'user')
-      .where('user_id = :userId', { userId })
-      .andWhere('week_day = :weekDay', { weekDay: dayName })
-      .orderBy('activities.timestamp', 'ASC')
-        .getMany();
-      
-      return this.parseActivities(activities);
-    }
+    return result;
   }
 
   /**
@@ -68,6 +56,15 @@ class ScheduleService {
    * @returns A promise that resolves to the result of adding new activity.
    */
   public async addActivity(activityData: ActivityDto) {
+    const activities: Activity[] = await this.activityRepository.createQueryBuilder('activities')
+    .leftJoinAndSelect('activities.creator', 'user')
+    .where('user_id = :userId', { userId: activityData.userId })
+    .andWhere('week_day = :weekDay', { weekDay: activityData.dayName})
+    .orderBy('activities.timestamp', 'ASC')
+      .getMany();
+    if (activities.length === 5) {
+      throw new Error('Limit of activities exceeded.');
+    }
     await this.activityRepository.createQueryBuilder('activity').insert().into(Activity).values({
       name: activityData.name,
       week_day: activityData.dayName,
@@ -87,6 +84,16 @@ class ScheduleService {
    * @throws Error if no Activity with the specified ID is found or user ID doesn't match.
    */
   public async updateActivity(activityData: ActivityDto) {
+    const activities: Activity[] = await this.activityRepository.createQueryBuilder('activities')
+    .leftJoinAndSelect('activities.creator', 'user')
+    .where('user_id = :userId', { userId: activityData.userId })
+    .andWhere('week_day = :weekDay', { weekDay: activityData.dayName})
+    .orderBy('activities.timestamp', 'ASC')
+      .getMany();
+    const isThere = (activities.filter(data => data.id === activityData.id)).length;
+    if (activities.length === 5 && !isThere) {
+      throw new Error('Limit of activities exceeded.');
+    }
     const activity: Activity | null = await this.activityRepository.findOne({
       where: {
         id: activityData.id,
@@ -143,7 +150,7 @@ class ScheduleService {
    * @returns The array of only needed activities info.
    */
   private parseActivities(activities: Activity[]): getActivityResult[] {
-    return activities.map(activity => ({ id: activity.id, name: activity.name, weekDay: activity.week_day, url: activity.url, time: activity.timestamp }));
+    return activities.map(activity => ({ id: activity.id, name: activity.name, weekDay: activity.week_day, url: activity.url, time: (activity.timestamp.split(":")).slice(0, 2).join(':') }));
   }
 }
 
