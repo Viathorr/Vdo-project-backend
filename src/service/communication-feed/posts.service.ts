@@ -220,7 +220,7 @@ class PostsService {
     try {
       await this.postRepository.createQueryBuilder('posts').insert().into(Post).values({
         content: postData.content,
-        user: { id: postData.id }
+        user: { id: postData.userId }
       }).execute();
       return 'Success';
     } catch (err) {
