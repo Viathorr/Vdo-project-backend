@@ -13,9 +13,10 @@ export type postInfo = {
   content: string,
   created_at?: Date,
   username: string,
-  likes: number,  
+  userImage: string,
+  likes: number,
   comments: number
-}
+};
 
 export type getPostsResult = {
   prevPage?: number,
@@ -75,6 +76,7 @@ class PostsService {
           content: post.content,
           created_at: post.created_at,
           username: postUserInfos[index].name,
+          userImage: postUserInfos[index].profileImageURL,
           likes: likesNums[index].numOfLikes,
           comments: commentsNums[index]
         }));
@@ -121,6 +123,7 @@ class PostsService {
           content: saved.post.content,
           createdAt: saved.created_at,
           username: postUserInfos[index].name,
+          userImage: postUserInfos[index].profileImageURL,
           likes: likesNums[index].numOfLikes,
           comments: commentsNums[index]
         }));
@@ -227,7 +230,7 @@ class PostsService {
       throw err;
     }
   }
-
+ 
   /**
    * Updates an existing post in the database.
    * @param postData - The PostDto object containing post ID, user ID, and updated content.
