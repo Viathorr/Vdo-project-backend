@@ -13,7 +13,7 @@ export type postInfo = {
   content: string,
   created_at?: Date,
   username: string,
-  userImage: string,
+  userProfileImageURL: string,
   likes: number,
   comments: number
 };
@@ -32,6 +32,7 @@ export type getPostResult = {
   created_at: Date,
   updated_at: Date,
   numOfLikes?: number,
+  comments?: number,
   liked?: boolean,
   saved?: boolean
 };
@@ -76,7 +77,7 @@ class PostsService {
           content: post.content,
           created_at: post.created_at,
           username: postUserInfos[index].name,
-          userImage: postUserInfos[index].profileImageURL,
+          userProfileImageURL: postUserInfos[index].profileImageURL,
           likes: likesNums[index].numOfLikes,
           comments: commentsNums[index]
         }));
@@ -123,7 +124,7 @@ class PostsService {
           content: saved.post.content,
           createdAt: saved.created_at,
           username: postUserInfos[index].name,
-          userImage: postUserInfos[index].profileImageURL,
+          userProfileImageURL: postUserInfos[index].profileImageURL,
           likes: likesNums[index].numOfLikes,
           comments: commentsNums[index]
         }));
@@ -176,6 +177,7 @@ class PostsService {
     }
   }
  
+  // TODO: add num of comments
    /**
    * Retrieves detailed information about a specific post.
    * @param postData - The PostDto object containing post ID and user ID.
@@ -195,8 +197,9 @@ class PostsService {
 
         const likes = await LikesService.getNumOfLikes(postData.id as number, postData.userId);
         const userInfo = await UserService.getPostUserInfo(post.user.id);
+        const comments = await CommentsService.getNumOfComments(postData.id as number);
 
-        result = { ...result, numOfLikes: likes.numOfLikes, liked: likes.likedByUser, username: userInfo.name, userProfileImageURL: userInfo.profileImageURL };
+        result = { ...result, numOfLikes: likes.numOfLikes, liked: likes.likedByUser, username: userInfo.name, userProfileImageURL: userInfo.profileImageURL, comments };
         
         const saved: Saved | null = await this.savedPostsRepository.findOne({
           where: { user: { id: postData.userId }, post: { id: postData.id } },
@@ -307,7 +310,7 @@ class PostsService {
   private async getAllNeededPostsInformation(posts: Post[] | Saved[]) {
     const postUserInfoPromises = posts.map(post => UserService.getPostUserInfo(post instanceof Post ? post.user.id : post.post.user.id));
     const likesNumPromises = posts.map(post => LikesService.getNumOfLikes(post instanceof Post ? post.id : post.post.id));
-    const commentsNumPromises= posts.map(post => CommentsService.getNumOfComments(post instanceof Post ? post.id : post.post.id));
+    const commentsNumPromises = posts.map(post => CommentsService.getNumOfComments(post instanceof Post ? post.id : post.post.id));
 
     const postUserInfos = await Promise.all(postUserInfoPromises);
     const likesNums = await Promise.all(likesNumPromises);
