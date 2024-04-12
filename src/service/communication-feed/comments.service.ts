@@ -8,7 +8,7 @@ export type commentInfo = {
   created_at: Date,
   username: string,
   userIsCreator: boolean, // whether this comment belongs to the user who sent a request
-  userProfileImageUrl: string
+  userProfileImageURL: string
 }
  
 export type getCommentsResult = {
@@ -56,7 +56,7 @@ class CommentsService {
           created_at: comment.created_at,
           username: comment.user.name,
           userIsCreator: comment.user.id === userId ? true : false,
-          userProfileImageUrl: comment.user.profile_picture
+          userProfileImageURL: comment.user.profile_picture
         }));
       }
 

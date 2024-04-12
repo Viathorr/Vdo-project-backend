@@ -3,7 +3,7 @@ import PostsService, { getPostResult, getPostsResult } from '../../service/commu
 import Controller from '../../interfaces/controller.interface';
 import RequestWithUserId from '../../interfaces/requestWithUserId.interface';
 import { PostDtoBuilder } from '../../dto/post.dto';
-
+ 
 /**
  * Controller handling routes related to posts.
  */
@@ -36,6 +36,8 @@ export class PostsController implements Controller {
       // @ts-ignore
       .get(this.getPost)
       // @ts-ignore
+      .post(this.savePost)
+      // @ts-ignore
       .put(this.updatePost)
       // @ts-ignore
       .delete(this.deletePost);
@@ -54,7 +56,7 @@ export class PostsController implements Controller {
   public getPosts = async (req: RequestWithUserId, res: Response) => {
     console.log('Get all posts request');
     const page: number = parseInt(req.query.page as string) || 1;
-    const limit: number = parseInt(req.query.limit as string) || 10;
+    const limit: number = parseInt(req.query.limit as string) || 5;
     const userId: number = req.id;
     try {
       const result: getPostsResult = await this.postsService.getAllPosts(userId, page, limit);
@@ -69,7 +71,7 @@ export class PostsController implements Controller {
   }
 
   // request sent every time user opens his posts page
-  // URL: http://localhost:3500/my_posts?page=:page&limit=:limit
+  // URL: http://localhost:3500/posts/my?page=:page&limit=:limit
   /**
    * Handles GET request to fetch posts created by the user.
    * @param req Request object containing query parameters: page and limit.
@@ -78,7 +80,7 @@ export class PostsController implements Controller {
   public getUserPosts = async (req: RequestWithUserId, res: Response) => {
     console.log('Get user posts request');
     const page: number = parseInt(req.query.page as string) || 1;
-    const limit: number = parseInt(req.query.limit as string) || 10;
+    const limit: number = parseInt(req.query.limit as string) || 5;
     const userId: number = req.id;
     try {
       const result: getPostsResult = await this.postsService.getUsersPosts(userId, page, limit);
@@ -93,7 +95,7 @@ export class PostsController implements Controller {
   }
    
   // request sent every time user opens his saved posts page
-  // URL: http://localhost:3500/my_posts/saved?page=:page&limit=:limit
+  // URL: http://localhost:3500/posts/saved?page=:page&limit=:limit
   /**
    * Handles GET request to fetch saved posts by the user.
    * @param req Request object containing query parameters: page and limit.
@@ -102,7 +104,7 @@ export class PostsController implements Controller {
   public getSavedPosts = async (req: RequestWithUserId, res: Response) => {
     console.log('Get saved posts request');
     const page: number = parseInt(req.query.page as string) || 1;
-    const limit: number = parseInt(req.query.limit as string) || 10;
+    const limit: number = parseInt(req.query.limit as string) || 5;
     const userId: number = req.id;
     try {
       const result: getPostsResult = await this.postsService.getSavedPosts(userId, page, limit);
@@ -148,6 +150,18 @@ export class PostsController implements Controller {
     try {
       const result: string = await this.postsService.addPost(this.postDtoBuilder.addContent(content).addUserId(req.id).build());
       return res.status(201).json({ message: result });
+    } catch (err) {
+      console.log(err instanceof Error ? err.message : err);
+      return res.sendStatus(500);
+    }
+  }
+
+  public savePost = async (req: RequestWithUserId, res: Response) => {
+    console.log('Save post request.');
+    // TODO complete this handler
+    try {
+      const result: string = await this.postsService.savePost(this.postDtoBuilder.addId(parseInt(req.params.id)).addUserId(req.id).build());
+      return res.json({ message: result });
     } catch (err) {
       console.log(err instanceof Error ? err.message : err);
       return res.sendStatus(500);

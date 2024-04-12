@@ -71,11 +71,11 @@ class PostsService {
         paginationInfo(result, posts, pageNum, limit, offset);
       
         const { postUserInfos, likesNums, commentsNums } = await this.getAllNeededPostsInformation(posts);
-
+ 
         // @ts-ignore
         result.posts = posts.map((post, index) => ({
           content: post.content,
-          created_at: post.created_at,
+          createdAt: post.created_at,
           username: postUserInfos[index].name,
           userProfileImageURL: postUserInfos[index].profileImageURL,
           likes: likesNums[index].numOfLikes,
@@ -226,6 +226,19 @@ class PostsService {
     try {
       await this.postRepository.createQueryBuilder('posts').insert().into(Post).values({
         content: postData.content,
+        user: { id: postData.userId }
+      }).execute();
+      return 'Success';
+    } catch (err) {
+      throw err;
+    }
+  }
+  
+  // CHECK this one
+  public async savePost(postData: PostDto): Promise<string> {
+    try {
+      await this.savedPostsRepository.createQueryBuilder('posts').insert().into(Saved).values({
+        post: { id: postData.id },
         user: { id: postData.userId }
       }).execute();
       return 'Success';
