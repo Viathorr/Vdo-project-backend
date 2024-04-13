@@ -25,13 +25,8 @@ export class LikesController implements Controller {
  
   // getLikes request is sent every time user clicks on certain post and is redirected to the page with that post's information, and server simply sends a number of likes of that particular post
   // also I have to add the property called liked/not liked (or sth else) to inform user whether he has liked this post or not
-  // URL: http://localhost:3500/comments?post_id=:id&page=:page&limit=:limit
-  // private getLikes = async (req: RequestWithUserId, res: Response) => {
-
-  // }
-   
   // adds new record to the Like table in db
-  // URL: http://localhost:3500/comments?post_id=:id
+  // URL: http://localhost:3500/likes?post_id=:id
   /**
    * Handles POST request to add a like to a post.
    * @param req Request object containing query parameter: post_id.
@@ -55,7 +50,7 @@ export class LikesController implements Controller {
   }
   
   // deletes the record from the Like table in db with certain user's id
-  // URL: http://localhost:3500/comments?post_id=:id
+  // URL: http://localhost:3500/likes?post_id=:id
   /**
    * Handles DELETE request to delete a like from a post.
    * @param req Request object containing query parameter: post_id.

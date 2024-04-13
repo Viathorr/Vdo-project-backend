@@ -26,7 +26,11 @@ export class PostsController implements Controller {
     
     this.router.route(`${this.path}/saved`)
       // @ts-ignore
-      .get(this.getSavedPosts);    
+      .get(this.getSavedPosts)
+      // @ts-ignore
+      .post(this.savePost)
+      // @ts-ignore
+      .delete(this.unsavePost);    
     
     this.router.route(`${this.path}/my`)
       // @ts-ignore
@@ -36,13 +40,9 @@ export class PostsController implements Controller {
       // @ts-ignore
       .get(this.getPost)
       // @ts-ignore
-      .post(this.savePost)
-      // @ts-ignore
       .put(this.updatePost)
       // @ts-ignore
       .delete(this.deletePost);
-    
-     
   }
 
   // request sent every time user opens posts feed
@@ -156,12 +156,42 @@ export class PostsController implements Controller {
     }
   }
 
+  // URL:  http://localhost:3000/posts/saved?post_id=:id
+   /**
+   * Handles POST request to save a certain post.
+   * @param req Request object containing the post content in the body.
+   * @param res Response object to send back the result.
+   */
   public savePost = async (req: RequestWithUserId, res: Response) => {
     console.log('Save post request.');
-    // TODO complete this handler
+    const { post_id } = req.query;
+    if (!post_id) {
+      return res.status(400).json({ message: 'Post ID is required.'});
+    }
     try {
-      const result: string = await this.postsService.savePost(this.postDtoBuilder.addId(parseInt(req.params.id)).addUserId(req.id).build());
+      const result: string = await this.postsService.savePost(this.postDtoBuilder.addId(parseInt(post_id as string)).addUserId(req.id).build());
       return res.json({ message: result });
+    } catch (err) {
+      console.log(err instanceof Error ? err.message : err);
+      return res.sendStatus(500);
+    }
+  };
+
+  // URL: http://localhost:3000/posts/saved?post_id=:id
+  /**
+   * Handles DELETE request to unsave a certain post.
+   * @param req Request object containing the post content in the body.
+   * @param res Response object to send back the result.
+   */
+  public unsavePost = async (req: RequestWithUserId, res: Response) => {
+    console.log('Unsave post request');
+    const { post_id } = req.query;
+    if (!post_id) {
+      return res.status(400).json({ message: 'Post ID is required.'});
+    }
+    try {
+      const result = await this.postsService.unsavePost(this.postDtoBuilder.addId(parseInt(post_id as string)).addUserId(req.id).build());
+      return res.json(result);
     } catch (err) {
       console.log(err instanceof Error ? err.message : err);
       return res.sendStatus(500);

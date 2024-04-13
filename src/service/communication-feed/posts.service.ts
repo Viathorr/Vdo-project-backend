@@ -10,6 +10,7 @@ import { paginationInfo } from "../paginationInfo.utility";
 import { PostDto } from "../../dto/post.dto";
 
 export type postInfo = {
+  id: number,
   content: string,
   created_at?: Date,
   username: string,
@@ -74,6 +75,7 @@ class PostsService {
  
         // @ts-ignore
         result.posts = posts.map((post, index) => ({
+          id: post.id,
           content: post.content,
           createdAt: post.created_at,
           username: postUserInfos[index].name,
@@ -121,6 +123,7 @@ class PostsService {
 
         // @ts-ignore
         result.posts = savedPosts?.map((saved, index) => ({
+          id: saved.id,
           content: saved.post.content,
           createdAt: saved.created_at,
           username: postUserInfos[index].name,
@@ -165,6 +168,7 @@ class PostsService {
 
         // @ts-ignore
         result.posts = userPosts?.map((post, index) => ({
+          id: post.id,
           content: post.content,
           createdAt: post.created_at,
           likes: likesNums[index].numOfLikes,
@@ -234,7 +238,12 @@ class PostsService {
     }
   }
   
-  // CHECK this one
+  /**
+   * Saves a post and adds its record to the database.
+   * @param postData - The PostDto object containing post ID and user ID.
+   * @returns A promise that resolves to a success message upon successful insertion.
+   * @throws Error if some error occurred during the database query processing.
+   */
   public async savePost(postData: PostDto): Promise<string> {
     try {
       await this.savedPostsRepository.createQueryBuilder('posts').insert().into(Saved).values({
@@ -242,6 +251,31 @@ class PostsService {
         user: { id: postData.userId }
       }).execute();
       return 'Success';
+    } catch (err) {
+      throw err;
+    }
+  }
+  
+  /**
+   * Unsaves a post and deletes its record from the database.
+   * @param postData - The PostDto object containing post ID and user ID.
+   * @returns A promise that resolves to a success message upon successful insertion.
+   * @throws Error if some error occurred during the database query processing.
+   */
+  public async unsavePost(postData: PostDto) {
+    try {
+      const result: DeleteResult = await this.savedPostsRepository
+        .createQueryBuilder()
+        .delete()
+        .from(Saved)
+        .where("post_id = :postId", { postId: postData.id })
+        .andWhere("user_id = :userId", { userId: postData.userId })
+        .execute();
+      if (result.affected == 1) {
+        return { message: 'Success' };
+      } else {
+        return { message: 'Fail' };
+      }
     } catch (err) {
       throw err;
     }
