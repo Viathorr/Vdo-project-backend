@@ -2,8 +2,9 @@ import AppDataSource from "../../config/mysqlConn";
 import { Comment } from "../../entity/communication-feed/comment.entity";
 import { DeleteResult, InsertResult, Repository } from "typeorm";
 import { paginationInfo } from "../paginationInfo.utility"; 
-
+ 
 export type commentInfo = {
+  id: number,
   content: string,
   created_at: Date,
   username: string,
@@ -52,6 +53,7 @@ class CommentsService {
         paginationInfo(result, comments, pageNum, limit, offset);
 
         result.comments = comments.map(comment => ({
+          id: comment.id,
           content: comment.content,
           created_at: comment.created_at,
           username: comment.user.name,

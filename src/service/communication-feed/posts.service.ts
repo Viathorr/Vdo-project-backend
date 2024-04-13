@@ -123,7 +123,7 @@ class PostsService {
 
         // @ts-ignore
         result.posts = savedPosts?.map((saved, index) => ({
-          id: saved.id,
+          id: saved.post.id,
           content: saved.post.content,
           createdAt: saved.created_at,
           username: postUserInfos[index].name,

@@ -2,7 +2,7 @@ import { Response, Router } from 'express';
 import Controller from '../../interfaces/controller.interface';
 import RequestWithUserId from '../../interfaces/requestWithUserId.interface';
 import CommentsService, { getCommentsResult } from '../../service/communication-feed/comments.service';
- 
+  
 /**
  * Controller handling routes related to comments on posts.
  */
