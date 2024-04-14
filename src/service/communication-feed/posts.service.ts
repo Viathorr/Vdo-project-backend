@@ -125,7 +125,7 @@ class PostsService {
         result.posts = savedPosts?.map((saved, index) => ({
           id: saved.post.id,
           content: saved.post.content,
-          createdAt: saved.created_at,
+          createdAt: saved.post.created_at,
           username: postUserInfos[index].name,
           userProfileImageURL: postUserInfos[index].profileImageURL,
           likes: likesNums[index].numOfLikes,
