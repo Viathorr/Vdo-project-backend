@@ -5,6 +5,19 @@ import RequestWithUserId from "../../interfaces/requestWithUserId.interface";
 import { UserDto } from "../../dto/user.dto";
 import { User } from "../../entity/user.entity";
 
+// Mock the initializeApp function
+jest.mock('firebase-admin/app', () => ({
+  initializeApp: jest.fn(),
+  cert: jest.fn()
+}));
+
+// Mock the getStorage function
+jest.mock('firebase-admin/storage', () => ({
+  getStorage: () => ({ bucket: jest.fn() }),
+  getDownloadURL: jest.fn()
+}));
+
+
 describe('get user info', () => {
   const mockGetUserData = jest.spyOn(userController.userService, 'getUserData');
 

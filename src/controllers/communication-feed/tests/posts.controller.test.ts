@@ -95,7 +95,7 @@ describe('get all posts', () => {
     await postsController.getPosts(mockReq, mockRes);
 
     expect(mockGetAllposts).toHaveBeenCalledTimes(1);
-    expect(mockGetAllposts).toHaveBeenCalledWith(1, 1, 10);
+    expect(mockGetAllposts).toHaveBeenCalledWith(1, 1, 5);
     expect(mockRes.statusCode).toBe(204);
     expect(mockRes._isEndCalled()).toBeTruthy();
   });
@@ -206,7 +206,7 @@ describe('get all user posts', () => {
     await postsController.getUserPosts(mockReq, mockRes);
 
     expect(mockGetUsersPosts).toHaveBeenCalledTimes(1);
-    expect(mockGetUsersPosts).toHaveBeenCalledWith(1, 1, 10);
+    expect(mockGetUsersPosts).toHaveBeenCalledWith(1, 1, 5);
     expect(mockRes.statusCode).toBe(204);
     expect(mockRes._isEndCalled()).toBeTruthy();
   });
@@ -221,7 +221,7 @@ describe('get all user posts', () => {
     await postsController.getUserPosts(mockReq, mockRes);
 
     expect(console.log).toHaveBeenCalledWith(mockError.message);
-    expect(mockGetUsersPosts).toHaveBeenCalledWith(1, 1, 10);
+    expect(mockGetUsersPosts).toHaveBeenCalledWith(1, 1, 5);
     expect(mockRes.statusCode).toBe(400);
     expect(mockRes._isEndCalled()).toBeTruthy();
   });
@@ -318,7 +318,7 @@ describe('get all saved posts', () => {
     await postsController.getSavedPosts(mockReq, mockRes);
 
     expect(mockGetSavedPosts).toHaveBeenCalledTimes(1);
-    expect(mockGetSavedPosts).toHaveBeenCalledWith(1, 1, 10);
+    expect(mockGetSavedPosts).toHaveBeenCalledWith(1, 1, 5);
     expect(mockRes.statusCode).toBe(204);
     expect(mockRes._isEndCalled()).toBeTruthy();
   });
@@ -333,7 +333,7 @@ describe('get all saved posts', () => {
     await postsController.getSavedPosts(mockReq, mockRes);
 
     expect(console.log).toHaveBeenCalledWith(mockError.message);
-    expect(mockGetSavedPosts).toHaveBeenCalledWith(1, 1, 10);
+    expect(mockGetSavedPosts).toHaveBeenCalledWith(1, 1, 5);
     expect(mockRes.statusCode).toBe(400);
     expect(mockRes._isEndCalled()).toBeTruthy();
   });

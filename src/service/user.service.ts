@@ -2,6 +2,7 @@ import  { UserDto, UserDtoBuilder } from "../dto/user.dto";
 import AppDataSource from "../config/mysqlConn";
 import { User } from "../entity/user.entity";
 import { Todo } from "../entity/todo.entity";
+import { Post } from "../entity/communication-feed/post.entity";
 import bcrypt from 'bcrypt';
 
 /**
@@ -23,13 +24,20 @@ class UserService {
       if (!user) { 
         throw new Error('No user with such ID.');
       } else {
-        // TODO add count of left todos
+        // the amount of left todos (that are not checked) for a specific user
         const leftTodos = await AppDataSource.getRepository(Todo).createQueryBuilder()
           .select()
           .where("user_id = :userId", { userId: userData.id }) // Specify the user ID
           .andWhere("checked = :checked", { checked: false }) // Check the 'checked' property
           .getMany();
-        return this.userDtoBuilder.addName(user.name).addEmail(user.email).addCountry(user.country).addPhoneNum(user.phone_num).addProfilePicture(user.profile_picture).addCompletedTodos(user.completed_todos).addLeftTodos(leftTodos.length).build();
+        
+        // the amount of asked questions for a specific user
+        const askedQuestions = await AppDataSource.getRepository(Post).createQueryBuilder()
+          .select()
+          .where("user_id = :userId", { userId: userData.id }) // Specify the user ID
+          .getMany();
+        
+        return this.userDtoBuilder.addName(user.name).addEmail(user.email).addCountry(user.country).addPhoneNum(user.phone_num).addProfilePicture(user.profile_picture).addCompletedTodos(user.completed_todos).addLeftTodos(leftTodos.length).addAskedQuestions(askedQuestions.length).build();
       }
     } catch (err) {
       console.log(err);
